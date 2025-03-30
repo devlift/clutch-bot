@@ -21,7 +21,7 @@ const HeaderTwo = () => {
           <div className="d-flex align-items-center justify-content-between">
             <div className="logo order-lg-0">
               <Link href="/" className="d-flex align-items-center">
-                <Image src={logo} width={200} alt="logo" priority />
+                <Image src={logo} width={120} alt="logo" priority />
               </Link>
             </div>
             <div className="right-widget ms-auto ms-lg-0 order-lg-3">
@@ -60,7 +60,7 @@ const HeaderTwo = () => {
                   <li className="d-block d-lg-none">
                     <div className="logo">
                       <Link href="/" className="d-block">
-                        <Image src={logo} alt="logo" width="100" priority />
+                        <Image src={logo} alt="logo" width={120} priority />
                       </Link>
                     </div>
                   </li>
