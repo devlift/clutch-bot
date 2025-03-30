@@ -1,9 +1,25 @@
+interface WowConstructor {
+  new (options?: { live: boolean }): {
+    init(): void;
+  };
+}
 
-export const animationCreate = () => {
+declare global {
+  interface Window {
+    WOW: any;
+  }
+}
+
+export const wowInit = () => {
   if (typeof window !== "undefined") {
-    import("wowjs").then((module) => {
-      const WOW = module.default;
-      new WOW.WOW({live: false}).init()
-    });
+    require('wowjs');
+    if (window.WOW) {
+      new window.WOW({
+        live: false
+      }).init();
+    }
   }
 };
+
+// Alias for backward compatibility
+export const animationCreate = wowInit;

@@ -1,4 +1,6 @@
 declare module 'wowjs' {
-  const WOW: any;
-  export default WOW;
+  export class WOW {
+    constructor(options?: { live: boolean });
+    init(): void;
+  }
 }

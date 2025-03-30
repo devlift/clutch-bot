@@ -41,8 +41,8 @@ export const metadata: Metadata = {
   title: 'Clutch Jobs',
   description: 'AI-Powered Job Search & Hiring Platform',
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
+    icon: '/icons/favicon.ico',
+    shortcut: '/icons/favicon.ico',
     apple: '/apple-touch-icon.png',
     other: {
       rel: 'apple-touch-icon-precomposed',
@@ -58,9 +58,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-      </head>
       <body suppressHydrationWarning={true} className={`${gordita.variable} ${garamond.variable}`}>
         <Providers>
           {children}
