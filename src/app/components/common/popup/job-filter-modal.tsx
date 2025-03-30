@@ -3,7 +3,7 @@ import React from "react";
 import { resetFilter } from "@/redux/features/filterSlice";
 import { useAppDispatch } from "@/redux/hook";
 import SearchFilter from "../../jobs/filter/job-filter-2/search-filter";
-import FilterCategory from "../../jobs/filter/job-filter-2/filter-category";
+
 import FilterLocation from "../../jobs/filter/job-filter-2/filter-location";
 import FilterEnglishFluency from "../../jobs/filter/job-filter-2/filter-english-fluency";
 import FilterJobType from "../../jobs/filter/job-filter-2/filter-job-type";
@@ -50,9 +50,7 @@ const JobFilterModal = ({ priceValue, setPriceValue, maxPrice }: IProps) => {
                   <div className="col-lg-3 col-sm-6">
                     <SearchFilter />
                   </div>
-                  <div className="col-lg-3 col-sm-6">
-                    <FilterCategory />
-                  </div>
+          
                   <div className="col-lg-3 col-sm-6">
                     <FilterLocation />
                   </div>

@@ -1,6 +1,6 @@
 "use client";
 import React,{useRef} from "react";
-import job_data from "@/data/job-data";
+
 import Slider from "react-slick";
 import JobGridItem from "./grid/job-grid-item";
 

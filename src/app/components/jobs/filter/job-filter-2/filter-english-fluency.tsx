@@ -1,5 +1,5 @@
 import React from "react";
-import job_data from "@/data/job-data";
+
 import { useAppDispatch } from "@/redux/hook";
 import NiceSelect from "@/ui/nice-select";
 import { setEnglishFluency } from "@/redux/features/filterSlice";

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import job_data from "@/data/job-data";
+
 import ListItemTwo from "./list-item-2";
 import { IJobType } from "@/types/job-data-type";
 import Pagination from "@/ui/pagination";
@@ -10,50 +10,92 @@ import slugify from "slugify";
 import NiceSelect from "@/ui/nice-select";
 import FilterAreaTwo from "../filter/job-filter-2/filter-area-2";
 
+interface Job {
+  id: string;
+  createdTime: string;
+  employerId: string;
+  title: string;
+  description: string;
+  tags: string[];
+  wage: number;
+  wageType: string;
+  location: string;
+  jobType: string;
+  schedule: string;
+  hours: string;
+  startDate: string;
+  benefits: string[];
+  requirements: string[];
+  responsibilities: string[];
+  howToApply: string;
+  advertiseUntil: string;
+  jobBankId: string;
+  status: string;
+  employer?: {
+    id: string;
+    companyName: string;
+    logo: string;
+    website: string;
+    location: string;
+    contactEmail: string;
+    phone: string;
+    industry: string;
+  }
+}
+
 const JobListV2Area = ({ itemsPerPage,grid_style=false }: { itemsPerPage: number;grid_style?:boolean }) => {
-  let all_jobs = job_data;
-  const maxPrice = job_data.reduce((max, job) => {
-    return job.salary > max ? job.salary : max;
+  const [allJobs, setAllJobs] = useState<Job[]>([]);
+  const maxPrice = allJobs.reduce((max, job) => {
+    return (job.wage || 0) > max ? (job.wage || 0) : max;
   }, 0);
   const { category, experience, job_type, location,english_fluency,search_key } = useAppSelector(
     (state) => state.filter
   );
-  const [currentItems, setCurrentItems] = useState<IJobType[] | null>(null);
-  const [filterItems, setFilterItems] = useState<IJobType[]>([]);
+  const [currentItems, setCurrentItems] = useState<Job[] | null>(null);
+  const [filterItems, setFilterItems] = useState<Job[]>([]);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
   const [jobType, setJobType] = useState(grid_style ?"grid" : "list");
   const [priceValue, setPriceValue] = useState([0, maxPrice]);
   const [shortValue, setShortValue] = useState("");
 
+  // Fetch jobs from Supabase
   useEffect(() => {
-    // Filter the job_data array based on the selected filters
-    let filteredData = all_jobs
-    .filter((item) => category.length !== 0 ? category.some((c) => item.category.includes(c)) : true)
-    .filter((item) =>
-      experience.length !== 0
-        ? experience.some((e) => item.experience.trim().toLowerCase() === e.trim().toLowerCase()) : true
-    )
-    .filter((e) => english_fluency ? e.english_fluency.toLowerCase() === english_fluency.toLowerCase() : true)
-    .filter((item) => search_key ? item.title.toLowerCase().includes(search_key.toLowerCase()) : true)
-    .filter((item) => (job_type ? item.duration === job_type : true))
-    .filter((l) => location ? slugify(l.location.split(',').join('-').toLowerCase(),'-') === location : true)
-    .filter((j) => j.salary >= priceValue[0] && j.salary <= priceValue[1]);
+    const fetchJobs = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/jobs`, {
+          cache: 'no-store'
+        });
+        if (!res.ok) throw new Error('Failed to fetch jobs');
+        const data = await res.json();
+        setAllJobs(data.jobs);
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+        setAllJobs([]);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
+  useEffect(() => {
+    // Filter the jobs array based on the selected filters
+    let filteredData = allJobs
+      .filter((item) => !search_key || item.title.toLowerCase().includes(search_key.toLowerCase()))
+      .filter((item) => !job_type || item.jobType === job_type)
+      .filter((item) => !location || slugify(item.location.split(',')[0].toLowerCase(), '-') === location)
+      .filter((item) => !priceValue || (item.wage >= priceValue[0] && item.wage <= priceValue[1]));
 
     if (shortValue === "price-low-to-high") {
-      filteredData = filteredData
-        .slice()
-        .sort((a, b) => Number(a.salary) - Number(b.salary));
+      filteredData = [...filteredData].sort((a, b) => (a.wage || 0) - (b.wage || 0));
     }
 
     if (shortValue === "price-high-to-low") {
-      filteredData = filteredData
-        .slice()
-        .sort((a, b) => Number(b.salary) - Number(a.salary));
+      filteredData = [...filteredData].sort((a, b) => (b.wage || 0) - (a.wage || 0));
     }
 
     const endOffset = itemOffset + itemsPerPage;
-    setFilterItems(filteredData)
+    setFilterItems(filteredData);
     setCurrentItems(filteredData.slice(itemOffset, endOffset));
     setPageCount(Math.ceil(filteredData.length / itemsPerPage));
   }, [
@@ -64,14 +106,14 @@ const JobListV2Area = ({ itemsPerPage,grid_style=false }: { itemsPerPage: number
     job_type,
     location,
     english_fluency,
-    all_jobs,
+    allJobs,
     priceValue,
     shortValue,
     search_key
   ]);
 
   const handlePageClick = (event: { selected: number }) => {
-    const newOffset = (event.selected * itemsPerPage) % all_jobs.length;
+    const newOffset = (event.selected * itemsPerPage) % allJobs.length;
     setItemOffset(newOffset);
   };
   // handleShort
@@ -95,7 +137,7 @@ const JobListV2Area = ({ itemsPerPage,grid_style=false }: { itemsPerPage: number
               <div className="job-post-item-wrapper">
                 <div className="upper-filter d-flex justify-content-between align-items-center mb-25 mt-70 lg-mt-40">
                   <div className="total-job-found">
-                    All <span className="text-dark">{all_jobs.length}</span>{" "}
+                    All <span className="text-dark">{allJobs.length}</span>{" "}
                     jobs found
                   </div>
                   <div className="d-flex align-items-center">
@@ -163,7 +205,7 @@ const JobListV2Area = ({ itemsPerPage,grid_style=false }: { itemsPerPage: number
                       <span className="text-dark fw-500">
                         {Math.min(
                           itemOffset + itemsPerPage,
-                          currentItems.length
+                          filterItems.length
                         )}
                       </span>{" "}
                       of{" "}

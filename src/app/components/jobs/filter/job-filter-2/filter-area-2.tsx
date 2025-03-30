@@ -1,6 +1,6 @@
 import React from "react";
 import SearchFilter from "./search-filter";
-import FilterCategory from "./filter-category";
+
 import FilterLocation from "./filter-location";
 import FilterJobType from "./filter-job-type";
 import FilterExperience from "./filter-experience";
@@ -41,9 +41,7 @@ const FilterAreaTwo = ({ priceValue, setPriceValue, maxPrice }: IProps) => {
               <div className="col-lg-3 col-sm-6">
                 <SearchFilter />
               </div>
-              <div className="col-lg-3 col-sm-6">
-                <FilterCategory />
-              </div>
+        
               <div className="col-lg-3 col-sm-6">
                 <FilterLocation />
               </div>

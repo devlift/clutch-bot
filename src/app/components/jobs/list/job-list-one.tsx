@@ -1,13 +1,74 @@
 import React from "react";
-import job_data from "@/data/job-data";
-import ListItem from "./list-item";
 import Link from "next/link";
+import ListItem from "./list-item";
 
-export function JobListItems({style_2=false}:{style_2?:boolean}) {
+interface Job {
+  id: string;
+  createdTime: string;
+  employerId: string;
+  title: string;
+  description: string;
+  tags: string[];
+  wage: number;
+  wageType: string;
+  location: string;
+  jobType: string;
+  schedule: string;
+  hours: string;
+  startDate: string;
+  benefits: string[];
+  requirements: string[];
+  responsibilities: string[];
+  howToApply: string;
+  advertiseUntil: string;
+  jobBankId: string;
+  status: string;
+  employer?: {
+    id: string;
+    companyName: string;
+    logo: string;
+    website: string;
+    location: string;
+    contactEmail: string;
+    phone: string;
+    industry: string;
+  }
+}
+
+async function getJobs() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/jobs`, {
+      cache: 'no-store'
+    });
+    if (!res.ok) throw new Error('Failed to fetch jobs');
+    const data = await res.json();
+    console.log('Jobs data from API:', JSON.stringify(data.jobs, null, 2));
+    return data.jobs;
+  } catch (error) {
+    console.error('Error fetching jobs:', error);
+    return [];
+  }
+}
+
+const processTags = (tags: any): string[] => {
+  if (!tags) return [];
+  if (Array.isArray(tags)) return tags;
+  if (typeof tags === 'string') return tags.split(',').map(tag => tag.trim());
+  return [];
+};
+
+export async function JobListItems({style_2=false}:{style_2?:boolean}) {
+  const jobs = await getJobs();
+  console.log('Jobs in JobListItems:', JSON.stringify(jobs, null, 2));
+  
   return (
     <>
-      {job_data.slice(0, 5).map((item) => (
-        <ListItem key={item.id} item={item} style_2={style_2} />
+      {jobs?.map((job: Job) => (
+        <ListItem 
+          key={job.id} 
+          item={job}
+          style_2={style_2} 
+        />
       ))}
     </>
   )
@@ -45,8 +106,6 @@ const JobListOne = () => {
               Explore all jobs
             </Link>
           </div>
-
-
         </div>
       </section>
     </>

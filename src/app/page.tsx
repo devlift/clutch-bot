@@ -13,30 +13,25 @@ import FeatureTwo from "@/app/components/features/feature-two";
 
 import Link from "next/link";
 
-
 export const metadata: Metadata = {
   title: "Clutch Jobs – AI-Powered Job Search & Hiring Platform",
   description: "Discover Clutch Jobs, an AI-driven platform that connects top talent with leading employers. Enjoy personalized job matches, streamlined hiring, and a smarter recruitment process.",
 };
 
-const HomeSix = () => {
+const HomeSix = async () => {
   return (
     <Wrapper>
       <div className="main-page-wrapper">
-    
-
         {/* hero banner start */}
         <HeroBannerSix />
         {/* hero banner end */}
 
-
-
         {/* category section start */}
-        <CategorySectionSix style_2={true} />
+        {/* <CategorySectionSix style_2={true} /> */}
         {/* category section end */}
 
         {/* trending jobs start */}
-        <section className="category-section-three pt-140 lg-pt-100">
+        {/* <section className="category-section-three pt-140 lg-pt-100">
           <div className="container">
             <div className="position-relative">
               <div className="title-one mb-60 lg-mb-40">
@@ -45,7 +40,7 @@ const HomeSix = () => {
               <TrendingJobs />
             </div>
           </div>
-        </section>
+        </section> */}
         {/* trending jobs end */}
 
         {/* job list items start */}
@@ -65,12 +60,12 @@ const HomeSix = () => {
               </div>
             </div>
             <div className="job-listing-wrapper mt-60 md-mt-40 wow fadeInUp">
+              {/* @ts-expect-error Async Server Component */}
               <JobListItems style_2={true} />
             </div>
             <div className="text-center mt-40 d-lg-none">
               <Link href="/job-list-v1" className="btn-six">Explore all jobs</Link>
             </div>
-
           </div>
         </section>
         {/* job list items end */}
@@ -79,16 +74,9 @@ const HomeSix = () => {
         <FancyBannerThree style_2={true} />
         {/* fancy banner end */}
 
-
-
-
-
         {/* text feature two start */}
         <FeatureTwo />
         {/* text feature two end */}
-
-
-
       </div>
     </Wrapper>
   );

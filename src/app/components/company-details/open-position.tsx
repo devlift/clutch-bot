@@ -1,5 +1,5 @@
 import React from "react";
-import job_data from "@/data/job-data";
+
 import ListItemTwo from "../jobs/list/list-item-2";
 
 const OpenPosition = () => {

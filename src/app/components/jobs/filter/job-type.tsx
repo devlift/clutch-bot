@@ -1,5 +1,5 @@
 import React from "react";
-import job_data from "@/data/job-data";
+
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { setJobType } from "@/redux/features/filterSlice";
 

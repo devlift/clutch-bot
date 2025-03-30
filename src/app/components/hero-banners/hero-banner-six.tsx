@@ -8,7 +8,7 @@ import CounterOne from '../counter/counter-one';
 
 
 const HeroBannerSix = () => {
-  const { handleSubmit, setCategoryVal,setSearchText } = useSearchFormSubmit();
+  const { handleSubmit, setSearchText } = useSearchFormSubmit();
   // handleSearchInput
   const handleSearchInput = (e:React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value)
@@ -20,7 +20,7 @@ const HeroBannerSix = () => {
           <div className="row">
             <div className="col-xxl-8 col-xl-9 col-lg-8 m-auto text-center">
               <h1 className="wow fadeInUp" data-wow-delay="0.3s">Empowering Your Next Career Move.</h1>
-              <p className="text-md text-white mt-25 mb-55 lg-mb-40 wow fadeInUp" data-wow-delay="0.4s">Discover the future of hiring. Clutch Jobs’ AI guides every step, connecting top talent with visionary employers. Your dream job or perfect candidate is just a click away.</p>
+              <p className="text-md text-white mt-25 mb-55 lg-mb-40 wow fadeInUp" data-wow-delay="0.4s">Discover the future of hiring. Clutch Jobs' AI guides every step, connecting top talent with visionary employers. Your dream job or perfect candidate is just a click away.</p>
             </div>
           </div>
           <div className="position-relative">
@@ -29,20 +29,20 @@ const HeroBannerSix = () => {
                 <div className="job-search-one style-two position-relative me-xxl-3 ms-xxl-3 mb-100 lg-mb-50 wow fadeInUp" data-wow-delay="0.5s">
                   <form onSubmit={handleSubmit}>
                     <div className="row">
-                      <div className="col-md-5">
-                        <div className="input-box">
-                          <div className="label">Your job title, keyword</div>
-                          <input onChange={handleSearchInput} type="text" placeholder="Google" className="keyword" />
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <div className="input-box border-left">
-                          <div className="label">Category</div>
-                          <JobCategorySelect setCategoryVal={setCategoryVal} />
+                      <div className="col-md-9">
+                        <div className="input-box w-100">
+                          <div className="label">Your job title, keyword and location</div>
+                          <input 
+                            onChange={handleSearchInput} 
+                            type="text" 
+                            placeholder="Construction Jobs in Toronto" 
+                            className="keyword w-100" 
+                            style={{ width: '100%' }}
+                          />
                         </div>
                       </div>
                       <div className="col-md-3">
-                        <button className="fw-500 text-md h-100 w-100 tran3s search-btn-two">Search</button>
+                        <button className="fw-500 text-uppercase h-100 w-100 tran3s search-btn-two">Search</button>
                       </div>
                     </div>
                   </form>

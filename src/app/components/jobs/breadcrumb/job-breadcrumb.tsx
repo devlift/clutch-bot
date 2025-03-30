@@ -5,34 +5,17 @@ import shape_1 from "@/assets/images/shape/shape_02.svg";
 import shape_2 from "@/assets/images/shape/shape_03.svg";
 import SearchForm from "../../forms/search-form";
 
-const JobBreadcrumb = ({
-  title = "Job Listing",
-  subtitle = "We delivered blazing fast & striking work solution",
-}: {
-  title?: string;
-  subtitle?: string;
-}) => {
+const JobBreadcrumb = () => {
   return (
-    <div className="inner-banner-one position-relative">
+    <div className="inner-banner-one position-relative" style={{ backgroundColor: '#1B6392' }}>
       <div className="container">
-        <div className="position-relative">
+        <div className="position-relative py-5">
+    
           <div className="row">
-            <div className="col-xl-6 m-auto text-center">
-              <div className="title-two">
-                <h2 className="text-white">{title}</h2>
-              </div>
-              <p className="text-lg text-white mt-30 lg-mt-20 mb-35 lg-mb-20">
-                {subtitle}
-              </p>
-            </div>
-          </div>
-          <div className="position-relative">
-            <div className="row">
-              <div className="col-xl-9 col-lg-8 m-auto">
-                <div className="job-search-one position-relative">
-                  <SearchForm/>
-                </div>
-              </div>
+            <div className="col-xxl-8 col-xl-9 col-lg-10 m-auto">
+              <form onSubmit={(e) => e.preventDefault()}>
+                <SearchForm />
+              </form>
             </div>
           </div>
         </div>
@@ -44,3 +27,4 @@ const JobBreadcrumb = ({
 };
 
 export default JobBreadcrumb;
+

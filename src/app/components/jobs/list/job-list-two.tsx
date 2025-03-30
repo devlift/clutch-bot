@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import job_data from "@/data/job-data";
+
 import shape from "@/assets/images/shape/shape_22.svg";
 import icon from "@/assets/images/icon/icon_19.svg";
 

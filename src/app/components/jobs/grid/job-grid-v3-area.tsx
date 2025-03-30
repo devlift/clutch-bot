@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import slugify from "slugify";
-import job_data from "@/data/job-data";
+
 import { IJobType } from "@/types/job-data-type";
 import Pagination from "@/ui/pagination";
 import JobGridItem from "../grid/job-grid-item";
