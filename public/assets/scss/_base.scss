@@ -237,12 +237,12 @@ hr {opacity: 0.09; margin: 5px 0;}
   min-width: 150px;
   text-align: center;
   border-radius: 50px;
-  color: #fff;
+  color: #fff !important;
   background: $color-three;
   @include transition(0.3s);
   &:hover {
     background: $color-one;
-    color: #fff;
+    color: #fff !important;
   }
 }
 .btn-five.border6 {
@@ -304,7 +304,7 @@ hr {opacity: 0.09; margin: 5px 0;}
 .btn-eight {
   display: inline-block;
   padding: 3px 25px;
-  color: #000;
+  color: #ffffff;
   border-radius: 30px;
   background: #F1F6F3;
   border: 1px solid #D6ECE0;
@@ -313,11 +313,11 @@ hr {opacity: 0.09; margin: 5px 0;}
     background: transparent;
   }
   span {
-    color: $color-three;
+    color: #ffffff;
   }
   a {
     font-weight: normal;
-    color: $color-three;
+    color: #ffffff;
     text-decoration: underline;
   }
 }

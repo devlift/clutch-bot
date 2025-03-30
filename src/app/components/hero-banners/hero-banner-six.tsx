@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-import banner_1 from '@/assets/images/assets/banner_img_01.jpg';
+import banner_1 from '@/assets/images/assets/banner.png';
 import banner_2 from '@/assets/images/assets/banner_img_02.jpg';
 import useSearchFormSubmit from '@/hooks/use-search-form-submit';
 import JobCategorySelect from '../select/job-category';
@@ -19,8 +19,8 @@ const HeroBannerSix = () => {
         <div className="position-relative">
           <div className="row">
             <div className="col-xxl-8 col-xl-9 col-lg-8 m-auto text-center">
-              <h1 className="wow fadeInUp" data-wow-delay="0.3s">Find & Hire Experts for any Job.</h1>
-              <p className="text-md text-white mt-25 mb-55 lg-mb-40 wow fadeInUp" data-wow-delay="0.4s">Unlock your potential with quality job & earn from world leading brands.</p>
+              <h1 className="wow fadeInUp" data-wow-delay="0.3s">Empowering Your Next Career Move.</h1>
+              <p className="text-md text-white mt-25 mb-55 lg-mb-40 wow fadeInUp" data-wow-delay="0.4s">Discover the future of hiring. Clutch Jobs’ AI guides every step, connecting top talent with visionary employers. Your dream job or perfect candidate is just a click away.</p>
             </div>
           </div>
           <div className="position-relative">
@@ -50,13 +50,13 @@ const HeroBannerSix = () => {
               </div>
             </div>
 
-            <div className="row">
+            {/* <div className="row">
               <div className="col-xl-8 m-auto">
                 <div className="row">
                   <CounterOne style_2={true}/>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -64,8 +64,8 @@ const HeroBannerSix = () => {
         <div className="carousel-inner w-100 h-100">
           <div className="carousel-item active" style={{ backgroundImage: `url(${banner_1.src})` }}>
           </div>
-          <div className="carousel-item" style={{ backgroundImage: `url(${banner_2.src})` }}>
-          </div>
+          {/* <div className="carousel-item" style={{ backgroundImage: `url(${banner_2.src})` }}>
+          </div> */}
         </div>
       </div>
     </div>

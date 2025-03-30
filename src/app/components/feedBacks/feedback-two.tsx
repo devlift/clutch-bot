@@ -89,7 +89,7 @@ const FeedbackTwo = () => {
           <div className="col-lg-4">
             <div className="title-one mt-50 wow fadeInUp" data-wow-delay="0.3s">
               <div className="sub-title">TESTIMONIAL</div>
-              <h2 className="fw-600">Clients loves jobi.</h2>
+              <h2 className="fw-600">Clients loves Clutch Jobs.</h2>
             </div>
             <div className="fw-500 rating-title mt-80 lg-mt-40 mb-5 wow fadeInUp" data-wow-delay="0.4s">A+ Rating</div>
             <p className="wow fadeInUp" data-wow-delay="0.5s">Avg rating 4.8 makes us best market place.</p>

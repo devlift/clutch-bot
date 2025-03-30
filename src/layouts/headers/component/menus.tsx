@@ -66,7 +66,7 @@ const Menus = () => {
           </li>
         ) : (
           <li key={menu.id} className="nav-item">
-            <Link className="nav-link" href='/contact' role="button">
+            <Link className="nav-link" href={menu.link} role="button">
               {menu.title}
             </Link>
           </li>

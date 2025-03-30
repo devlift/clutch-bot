@@ -15,9 +15,7 @@ const FaqPage = () => {
   return (
     <Wrapper>
       <div className="main-page-wrapper">
-        {/* header start */}
-        <Header />
-        {/* header end */}
+
 
         {/*breadcrumb start */}
         <CompanyBreadcrumb
@@ -34,9 +32,7 @@ const FaqPage = () => {
         <JobPortalIntro top_border={true} />
         {/* job portal intro end */}
 
-        {/* footer start */}
-        <FooterOne />
-        {/* footer end */}
+
       </div>
     </Wrapper>
   );

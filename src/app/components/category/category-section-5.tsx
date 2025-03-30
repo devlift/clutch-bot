@@ -15,7 +15,7 @@ function CategoryItem({
     <div className="col-lg-3 col-sm-6 mt-30">
       <div
         className="title fw-500"
-        style={{ color: isActive ? "#00BF58" : "" }}
+        style={{ color: isActive ? "#75a441" : "" }}
       >
         {title}
       </div>

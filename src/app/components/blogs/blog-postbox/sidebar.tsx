@@ -54,7 +54,7 @@ const BlogSidebar = () => {
             </div>
             <div className="post ps-4">
               <h4 className="mb-5">
-                <Link href={`/blog-details/${b.id}`} className="title tran3s">
+                <Link href={`/blog/${b.id}`} className="title tran3s">
                   {b.title}
                 </Link>
               </h4>

@@ -13,9 +13,9 @@ const content_data: {
   subtitle: string;
   icon: StaticImageData;
 }[] = [
-    { title: 'It’s take 2 minutes to open an account.', subtitle: 'Open Acount', icon: icon_1 },
-    { title: 'Find talents or search your desire work.', subtitle: 'Apply job or hire', icon: icon_2 },
-    { title: 'Get work done quickly with jobi gatweay.', subtitle: 'Payment Method', icon: icon_3 },
+    { title: 'Set up your profile in minutes.', subtitle: 'Join Now', icon: icon_1 },
+    { title: 'Discover tailored job matches and top talent.', subtitle: 'Explore', icon: icon_2 },
+    { title: 'Experience seamless, AI-powered hiring.', subtitle: 'Learn More', icon: icon_3 },
   ]
 
 const FancyBannerThree = ({ style_2 = false }: { style_2?: boolean }) => {
@@ -32,10 +32,10 @@ const FancyBannerThree = ({ style_2 = false }: { style_2?: boolean }) => {
                     <i className="bi bi-play-fill"></i>
                   </a>
                   <div className="title-one mt-35 lg-mt-30 mb-30 lg-mb-20">
-                    <h2 className="fw-600 text-white">Let’s get started
-                      It’s <span style={{ color: '#00BF58' }}>simple.</span></h2>
+                    <h2 className="fw-600 text-white">Let's get started.
+                      It's <span style={{ color: '#75a441' }}>effortless.</span></h2>
                   </div>
-                  <p className="text-white">Get access to our top 1% talent as well as a complete set of hybrid workforce management tools.</p>
+                  <p className="text-white">Unlock opportunities with our AI-powered platform that seamlessly connects top talent with visionary employers.</p>
                 </div>
               </div>
             </div>
@@ -69,9 +69,10 @@ const FancyBannerThree = ({ style_2 = false }: { style_2?: boolean }) => {
                     <i className="bi bi-play-fill"></i>
                   </a>
                   <div className="title-one mt-25 mb-25 lg-mb-20">
-                    <h2 className="text-white main-font">Let’s get started It’s <span style={{ color: '#00BF58' }}>simple.</span></h2>
+                    <h2 className="text-white main-font">Let's get started.
+                      It's <span style={{ color: '#75a441' }}>effortless.</span></h2>
                   </div>
-                  <p className="text-white text-md">Get access to our top 1% talent as well as a complete set of hybrid workforce management tools.</p>
+                  <p className="text-white text-md">Unlock opportunities with our AI-powered platform that seamlessly connects top talent with visionary employers.</p>
                 </div>
               </div>
             </div>

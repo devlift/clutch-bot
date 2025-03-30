@@ -26,11 +26,11 @@ const ListItemThree = ({ item }: { item: IJobType }) => {
           <i className="bi bi-bookmark-dash"></i>
         </a>
         <div className="list-header d-flex align-items-center">
-          <Link href={`/job-details-v1/${id}`} className="logo">
+          <Link href={`/jobs/${id}`} className="logo">
             <Image src={logo} alt="logo" className="lazy-img m-auto" width={50} height={50} />
           </Link>
           <div className="info-wrapper">
-            <Link href={`/job-details-v1/${id}`} className="title fw-500 tran3s">
+            <Link href={`/jobs/${id}`} className="title fw-500 tran3s">
              {title}
             </Link>
             <ul className="style-none d-flex flex-wrap info-data">
@@ -47,13 +47,13 @@ const ListItemThree = ({ item }: { item: IJobType }) => {
           <div className="d-flex align-items-center">
             <Image src={verify} alt="icon" />
             <span className="fw-500 client-status">Verified Client .</span>
-            <Link href={`/job-details-v1/${id}`}
+            <Link href={`/jobs/${id}`}
               className={`job-duration fw-500 ${duration === "Part time" ? "part-time" : ""}`}
             >
               {duration}
             </Link>
           </div>
-          <Link href={`/job-details-v1/${id}`}
+          <Link href={`/jobs/${id}`}
             className="apply-btn text-center tran3s xs-mt-20"
           >
             APPLY

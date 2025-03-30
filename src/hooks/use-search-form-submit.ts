@@ -37,7 +37,7 @@ const useSearchFormSubmit = () => {
     const queryParams = generateQueryParams();
 
     if (queryParams) {
-      router.push(`/job-search?${queryParams}`);
+      router.push(`/search?${queryParams}`);
     } else {
       router.push(`/`);
       setCategoryVal("");

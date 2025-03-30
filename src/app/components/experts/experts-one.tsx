@@ -101,7 +101,7 @@ const ExpertsOne = () => {
                     className="lazy-img shapes shapes"
                   />
                 </span>{" "}
-                expert in jobi.
+                expert in Clutch Jobs.
               </h2>
             </div>
           </div>

@@ -2,7 +2,7 @@
 import Slider from "react-slick";
 import React, { useRef } from "react";
 import logo_1 from "@/assets/images/logo/media_01.png";
-import logo_2 from "@/assets/images/logo/media_02.png";
+import logo_2 from "@/assets/images/logo/media_02.jpg";
 import logo_3 from "@/assets/images/logo/media_01.png";
 import logo_white_1 from "@/assets/images/logo/media_27.png";
 import logo_white_2 from "@/assets/images/logo/media_28.png";
@@ -44,7 +44,7 @@ const feedback_data: {
       id: 1,
       logo: logo_1,
       title:
-        "“Seattle opera simplifies Performance planning with jobi eSignature.”",
+        "“Seattle opera simplifies Performance planning with Clutch Jobs eSignature.”",
       name: "James Brower",
       user_title: "Lead Designer",
       rating: 4.5,
@@ -55,7 +55,7 @@ const feedback_data: {
       id: 2,
       logo: logo_2,
       title:
-        "“Seattle opera simplifies Performance planning with jobi eSignature.”",
+        "“Seattle opera simplifies Performance planning with Clutch Jobs eSignature.”",
       name: "Mark Joge",
       user_title: "Marketing Chief",
       rating: 4.8,
@@ -66,7 +66,7 @@ const feedback_data: {
       id: 3,
       logo: logo_3,
       title:
-        "“Seattle opera simplifies Performance planning with jobi eSignature.”",
+        "“Seattle opera simplifies Performance planning with Clutch Jobs eSignature.”",
       name: "James Brower",
       user_title: "Lead Designer",
       rating: 4.8,

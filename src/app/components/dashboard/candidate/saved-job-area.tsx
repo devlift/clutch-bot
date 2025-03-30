@@ -50,7 +50,7 @@ const SavedJobArea = ({setIsOpenSidebar}:IProps) => {
                   </div>
                 </div>
                 <div className="col-lg-3 col-md-4 col-sm-6 ms-auto">
-                  <Link href={`/job-details-v1/${j.id}`}
+                  <Link href={`/jobs/${j.id}`}
                     className={`job-duration fw-500 ${
                       j.duration === "Part time" ? "part-time" : ""
                     }`}

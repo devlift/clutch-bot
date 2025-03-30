@@ -19,18 +19,18 @@ const ListItemTwo = ({ item }: { item: IJobType }) => {
       <div className="row justify-content-between align-items-center">
         <div className="col-md-5">
           <div className="job-title d-flex align-items-center">
-            <Link href={`/job-details-v1/${item.id}`} className="logo">
+            <Link href={`/jobs/${item.id}`} className="logo">
               <Image src={item.logo} alt="logo" className="lazy-img m-auto" />
             </Link>
             <div className="split-box1">
               <Link
-                href={`/job-details-v1/${item.id}`}
+                href={`/jobs/${item.id}`}
                 className="job-duration fw-500"
               >
                 {item.duration}
               </Link>
               <Link
-                href={`/job-details-v1/${item.id}`}
+                href={`/jobs/${item.id}`}
                 className="title fw-500 tran3s"
               >
                 {item.title.slice(0, 22)} {item.title.length > 20 ? ".." : ""}
@@ -40,7 +40,7 @@ const ListItemTwo = ({ item }: { item: IJobType }) => {
         </div>
         <div className="col-md-4 col-sm-6">
           <div className="job-location">
-            <Link href={`/job-details-v1/${item.id}`}>{item.location}</Link>
+            <Link href={`/jobs/${item.id}`}>{item.location}</Link>
           </div>
           <div className="job-salary">
             <span className="fw-500 text-dark">${item.salary}</span> /{" "}
@@ -57,7 +57,7 @@ const ListItemTwo = ({ item }: { item: IJobType }) => {
               <i className="bi bi-bookmark-dash"></i>
             </a>
             <Link
-              href={`/job-details-v1/${item.id}`}
+              href={`/jobs/${item.id}`}
               className="apply-btn text-center tran3s"
             >
               APPLY

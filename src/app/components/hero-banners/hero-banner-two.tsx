@@ -8,10 +8,10 @@ import shape_3 from '@/assets/images/shape/shape_17.svg';
 import shape_4 from '@/assets/images/shape/shape_18.svg';
 import shape_5 from '@/assets/images/shape/shape_19.svg';
 import shape_6 from '@/assets/images/shape/shape_20.svg';
-import screen_1 from '@/assets/images/assets/screen_04.png';
-import screen_2 from '@/assets/images/assets/screen_05.png';
+import screen_1 from '@/assets/images/assets/screen_04.webp';
+import screen_2 from '@/assets/images/assets/screen_05.webp';
 import screen_3 from '@/assets/images/assets/screen_06.png';
-import main_img from '@/assets/images/assets/img_10.png';
+import main_img from '@/assets/images/assets/img_10.webp';
 import useSearchFormSubmit from '@/hooks/use-search-form-submit';
 
 const HeroBannerTwo = () => {
@@ -26,7 +26,7 @@ const HeroBannerTwo = () => {
         <div className="position-relative pt-225 xl-pt-200 lg-pt-150 pb-80 lg-pb-60">
           <div className="row">
             <div className="col-lg-6 col-md-8">
-              <h1 className="wow fadeInUp" data-wow-delay="0.3s">Find & Hire <br /> Top 3% of expert on jobi.</h1>
+              <h1 className="wow fadeInUp" data-wow-delay="0.3s">Find & Hire <br /> Top 3% of expert on Clutch Jobs.</h1>
               <p className="text-md mt-35 mb-50 lg-mb-30 pe-xxl-5 wow fadeInUp" data-wow-delay="0.4s">With the largest professional creative community online, simply search through from our website</p>
             </div>
           </div>
@@ -39,7 +39,7 @@ const HeroBannerTwo = () => {
                     <button type='submit' className="btn-five h-100">Search</button>
                   </form>
                   <ul className="filter-tags d-flex flex-wrap style-none mt-25">
-                    <li className="fw-500 text-dark me-2">Populer:</li>
+                    <li className="fw-500 me-2">Popular:</li>
                     <li><a href="#">Design</a></li>
                     <li><a href="#">Art</a></li>
                     <li><a href="#">Business</a></li>

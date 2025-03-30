@@ -11,7 +11,7 @@ const FeatureEight = () => {
           <div className="col-lg-5 order-lg-last ms-auto">
             <div className="wow fadeInRight">
               <div className="title-one">
-                <h2 className="main-font">Find top talents from jobi.</h2>
+                <h2 className="main-font">Find top talents from Clutch Jobs.</h2>
               </div>
               <div className="accordion accordion-style-one mt-25" id="accordionOne">
                 <AccordionItem id='one' isShow={true} title='Seamless Search' desc='It only takes 5 minutes. Set-up is smooth and simple, with fully customisable page design to reflect your brand. It only takes 5 minutes.' parent='accordionOne' />

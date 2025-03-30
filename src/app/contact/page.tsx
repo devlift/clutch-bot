@@ -14,9 +14,7 @@ const ContactPage = () => {
   return (
     <Wrapper>
       <div className="main-page-wrapper">
-        {/* header start */}
-        <Header />
-        {/* header end */}
+   
 
         {/*MapArea start */}
         <MapArea />
@@ -26,9 +24,7 @@ const ContactPage = () => {
         <ContactArea />
         {/* contact area end */}
 
-        {/* footer start */}
-        <FooterOne />
-        {/* footer end */}
+      
       </div>
     </Wrapper>
   );

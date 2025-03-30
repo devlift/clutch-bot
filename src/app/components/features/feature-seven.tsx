@@ -18,7 +18,7 @@ const FeatureSeven = () => {
               <div className="ps-lg-4 wow fadeInRight">
                 <div className="title-one">
                   <div className="sub-title">Looking for an expert?</div>
-                  <h2 className="text-dark">Find top talents from jobi.</h2>
+                  <h2 className="text-dark">Find top talents from Clutch Jobs.</h2>
                 </div>
                 <div className="accordion accordion-style-one mt-25" id="accordionOne">
                   <AccordionItem id='one' isShow={true} title='Seamless Search' desc='It only takes 5 minutes. Set-up is smooth and simple, with fully customisable page design to reflect your brand. It only takes 5 minutes.' parent='accordionOne' />

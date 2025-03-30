@@ -46,12 +46,7 @@ const JobListOne = () => {
             </Link>
           </div>
 
-          <div className="text-center mt-80 lg-mt-30 wow fadeInUp">
-            <div className="btn-eight fw-500">
-              Do you want to post a job for your company?{" "}
-              <span>We can help.</span> <Link href="/register">Click here</Link>
-            </div>
-          </div>
+
         </div>
       </section>
     </>

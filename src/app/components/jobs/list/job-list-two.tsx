@@ -65,7 +65,7 @@ const JobListTwo = () => {
                   className="col-lg-4 col-md-6 isotop-item overflow-hidden"
                 >
                   <div className="job-list-two mt-40 lg-mt-20 position-relative">
-                    <Link href={`/job-details-v1/${item.id}`} className="logo">
+                    <Link href={`/jobs/${item.id}`} className="logo">
                       <Image
                         src={item.logo}
                         alt="logo"
@@ -75,21 +75,21 @@ const JobListTwo = () => {
                         className="lazy-img m-auto"
                       />
                     </Link>
-                    <Link href={`/job-details-v1/${item.id}`}
+                    <Link href={`/jobs/${item.id}`}
                       className="save-btn text-center rounded-circle tran3s"
                       title="Save Job"
                     >
                       <i className="bi bi-bookmark-dash"></i>
                     </Link>
                     <div>
-                      <Link href={`/job-details-v1/${item.id}`}
+                      <Link href={`/jobs/${item.id}`}
                         className="job-duration fw-500"
                       >
                         {item.duration}
                       </Link>
                     </div>
                     <div>
-                      <Link href={`/job-details-v1/${item.id}`}
+                      <Link href={`/jobs/${item.id}`}
                         className="title fw-500 tran3s"
                       >
                         {item.title}
@@ -98,9 +98,9 @@ const JobListTwo = () => {
                     <div className="job-date">{item.date}</div>
                     <div className="d-flex align-items-center justify-content-between">
                       <div className="job-location">
-                        <Link href={`/job-details-v1/${item.id}`}>{item.location}</Link>
+                        <Link href={`/jobs/${item.id}`}>{item.location}</Link>
                       </div>
-                      <Link href={`/job-details-v1/${item.id}`}
+                      <Link href={`/jobs/${item.id}`}
                         className="apply-btn text-center tran3s"
                       >
                         APPLY

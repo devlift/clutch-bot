@@ -20,27 +20,27 @@ const ListItem = ({ item,style_2,cls='' }: { item: IJobType;style_2?:boolean;cls
       <div className="row justify-content-between align-items-center">
         <div className="col-xxl-3 col-lg-4">
           <div className="job-title d-flex align-items-center">
-            <Link href={`/job-details-v1/${id}`} className="logo">
+            <Link href={`/jobs/${id}`} className="logo">
               <Image src={logo} alt="logo" className="lazy-img m-auto" />
             </Link>
-            <Link href={`/job-details-v1/${id}`} className="title fw-500 tran3s">
+            <Link href={`/jobs/${id}`} className="title fw-500 tran3s">
               {title}
             </Link>
           </div>
         </div>
         <div className="col-lg-3 col-md-4 col-sm-6 ms-auto">
-          <Link href={`/job-details-v1/${id}`}
+          <Link href={`/jobs/${id}`}
             className={`job-duration fw-500 ${duration === "Part time" ? "part-time" : ""}`}
           >
             {duration}
           </Link>
           <div className="job-date">
-            {date} by <Link href={`/job-details-v1/${id}`}>{company}</Link>
+            {date} by <Link href={`/jobs/${id}`}>{company}</Link>
           </div>
         </div>
         <div className="col-xxl-2 col-lg-3 col-md-4 col-sm-6 ms-auto xs-mt-10">
           <div className="job-location">
-            <Link href={`/job-details-v1/${id}`}>{location}</Link>
+            <Link href={`/jobs/${id}`}>{location}</Link>
           </div>
           <div className="job-category">
             {category.map((c, i) => (
@@ -59,7 +59,7 @@ const ListItem = ({ item,style_2,cls='' }: { item: IJobType;style_2?:boolean;cls
             >
               <i className="bi bi-bookmark-dash"></i>
             </a>
-            <Link href={`/job-details-v1/${id}`}
+            <Link href={`/jobs/${id}`}
               className="apply-btn text-center tran3s"
             >
               APPLY

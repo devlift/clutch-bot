@@ -7,7 +7,7 @@ const BlogItem = ({ item }: { item: IBlogDataType }) => {
   return (
     <article className="blog-meta-one mt-35 wow fadeInUp">
       <figure className="post-img m0">
-        <Link href={`/blog-details/${item.id}`} className="w-100 d-block">
+        <Link href={`/blog/${item.id}`} className="w-100 d-block">
           <Image
             src={item.img}
             alt="blog-img"
@@ -23,7 +23,7 @@ const BlogItem = ({ item }: { item: IBlogDataType }) => {
             </li>
           ))}
         </ul>
-        <Link href={`/blog-details/${item.id}`} className="mt-10 mb-10">
+        <Link href={`/blog/${item.id}`} className="mt-10 mb-10">
           <h4 className="tran3s blog-title">{item.title}</h4>
         </Link>
         <div className="author">

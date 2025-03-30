@@ -16,9 +16,7 @@ const PricingPage = () => {
   return (
     <Wrapper>
       <div className="main-page-wrapper">
-        {/* header start */}
-        <Header />
-        {/* header end */}
+       
 
         {/*breadcrumb start */}
         <CompanyBreadcrumb title="Pricing" subtitle="Choose your membership" />
@@ -36,9 +34,7 @@ const PricingPage = () => {
         <JobPortalIntro />
         {/* job portal intro end */}
 
-        {/* footer start */}
-        <FooterOne />
-        {/* footer end */}
+   
       </div>
     </Wrapper>
   );

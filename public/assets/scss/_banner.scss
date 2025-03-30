@@ -33,10 +33,28 @@
 }
 // Hero Banner Two
 .hero-banner-two {
-    background: #E2F9EE;
+    background: #166a9a;
     z-index: 1;
     h1 {
         font-size: 90px;
+        color: #ffffff;
+    }
+    p {
+        color: rgba(255, 255, 255, 0.85);
+    }
+    .filter-tags {
+        li {
+            color: rgba(255, 255, 255, 0.85);
+            &.fw-500 {
+                color: rgba(255, 255, 255, 0.85);
+            }
+            a {
+                color: rgba(255, 255, 255, 0.85);
+                &:hover {
+                    color: #ffffff;
+                }
+            }
+        }
     }
     .img-box {
         position: absolute;
@@ -350,7 +368,7 @@
 }
 // Fancy Banner Three
 .fancy-banner-three .bg-wrapper {
-    background: url(../images/assets/img_21.jpg) no-repeat center;
+    background: url(../images/assets/banner-2.png) no-repeat center;
     background-size: cover;
     z-index: 1;
     &::after {

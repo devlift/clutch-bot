@@ -1,5 +1,5 @@
 {
-  "name": "jobi",
+  "name": "Clutch Jobs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,6 +13,7 @@
     "@hookform/resolvers": "^3.1.1",
     "@popperjs/core": "^2.11.8",
     "@reduxjs/toolkit": "^1.9.5",
+    "@supabase/supabase-js": "^2.49.4",
     "@types/node": "20.2.5",
     "@types/react": "18.2.9",
     "@types/react-dom": "18.2.4",
@@ -22,10 +23,10 @@
     "bootstrap": "^5.3.0",
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.4",
-    "next": "13.4.4",
-    "react": "18.2.0",
+    "next": "^15.2.4",
+    "react": "^19.1.0",
     "react-countup": "^6.4.2",
-    "react-dom": "18.2.0",
+    "react-dom": "^19.1.0",
     "react-hook-form": "^7.45.3",
     "react-intersection-observer": "^9.5.2",
     "react-modal-video": "^2.0.0",

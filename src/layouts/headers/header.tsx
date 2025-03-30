@@ -18,7 +18,7 @@ const Header = () => {
           <div className="d-flex align-items-center">
             <div className="logo order-lg-0">
               <Link href="/" className="d-flex align-items-center">
-                <Image src={logo} alt="logo" priority />
+                <Image src={logo} width={300} alt="logo" priority />
               </Link>
             </div>
             <div className="right-widget ms-auto order-lg-3">

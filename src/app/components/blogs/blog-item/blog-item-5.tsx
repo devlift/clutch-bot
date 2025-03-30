@@ -7,10 +7,10 @@ const BlogItemFive = ({ blog }: { blog: IBlogDataType }) => {
   return (
     <article className="blog-meta-two mt-35 xs-mt-20 wow fadeInUp">
       <figure className="post-img m0">
-        <Link href={`/blog-details/${blog.id}`} className="w-100 d-block">
+        <Link href={`/blog/${blog.id}`} className="w-100 d-block">
           <Image src={blog.img} alt="" className="lazy-img w-100 tran4s" />
         </Link>
-        <Link href={`/blog-details/${blog.id}`} className="tags fw-500">
+        <Link href={`/blog/${blog.id}`} className="tags fw-500">
           {blog.tags[0]}
         </Link>
       </figure>
@@ -19,12 +19,12 @@ const BlogItemFive = ({ blog }: { blog: IBlogDataType }) => {
           {blog.featured && (
             <span className="fw-500 text-dark">Featured -</span>
           )}{" "}
-          <Link href={`/blog-details/${blog.id}`}>{blog.date}</Link>
+          <Link href={`/blog/${blog.id}`}>{blog.date}</Link>
         </div>
-        <Link href={`/blog-details/${blog.id}`}>
+        <Link href={`/blog/${blog.id}`}>
           <h4 className="tran3s blog-title">{blog.title}</h4>
         </Link>
-        <Link href={`/blog-details/${blog.id}`}
+        <Link href={`/blog/${blog.id}`}
           className="continue-btn tran3s d-flex align-items-center"
         >
           <span className="fw-500 me-2">Continue Reading</span>

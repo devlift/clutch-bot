@@ -5,7 +5,9 @@ import { useAppDispatch } from "@/redux/hook";
 import { animationCreate } from "@/utils/utils";
 import { usePathname } from "next/navigation";
 import { ToastContainer } from "react-toastify";
+import HeaderTwo from "./headers/header-2";
 
+import FooterOne from "./footers/footer-one";
 if (typeof window !== "undefined") {
   require("bootstrap/dist/js/bootstrap");
 }
@@ -26,8 +28,14 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => {
   }, [pathname]);
   return (
     <>
+    <HeaderTwo/>
+
       {children} 
       <ToastContainer />
+ 
+        {/* footer start */}
+        <FooterOne style_2={true} />
+        {/* footer end */}
     </>
   );
 };

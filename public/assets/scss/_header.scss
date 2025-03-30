@@ -5,12 +5,65 @@
     padding: 35px 40px;
     // box-shadow: 0 13px 35px -12px rgb(35 35 35 / 10%);
     @include transition(0.4s);
+
+    .logo {
+      img {
+        width: 240px !important;
+        height: auto;
+      }
+    }
+
     &.menu-overlay {
         position: absolute;
         top:0;
         right: 0;
         left: 0;
         background: transparent;
+        .navbar .nav-item .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            &:hover {
+                color: #ffffff;
+            }
+        }
+        .right-widget .text-dark {
+            color: rgba(255, 255, 255, 0.9) !important;
+            &:hover {
+                color: #ffffff !important;
+            }
+        }
+        .btn-five {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+            &:hover {
+                background: #ffffff;
+                color: rgb(8 32 40);
+                border-color: #ffffff;
+            }
+        }
+        &.fixed {
+            background: #ffffff;
+            .navbar .nav-item .nav-link {
+                color: #1C1C1C;
+                &:hover {
+                    color: rgb(8 32 40);
+                }
+            }
+            .right-widget .text-dark {
+                color: #1C1C1C !important;
+                &:hover {
+                    color: rgb(8 32 40) !important;
+                }
+            }
+            .btn-five {
+                color: rgb(8 32 40);
+                border-color: rgba(8, 32, 40, 0.3);
+                &:hover {
+                    background: rgb(8 32 40);
+                    color: #ffffff;
+                    border-color: rgb(8 32 40);
+                }
+            }
+        }
     }
     &.fixed {
         position: fixed;
@@ -20,6 +73,13 @@
         padding-bottom: 5px;
         background: #fff;
         box-shadow: 0 13px 35px -12px rgb(35 35 35 / 10%);
+    }
+    // Jobs and Job Details pages header style
+    &.jobs-header {
+        background: #166a9a;
+        &.fixed {
+            background: #166a9a;
+        }
     }
     .category-dropdown {
         .item {
@@ -254,19 +314,20 @@
 .theme-main-menu .login-btn-three {
     padding: 12px 27px;
     border: 1px solid #fff;
-    color: #fff;
+    color: #fff !important;
     border-radius: 50px;
     &:hover {
         background: $color-three;
         border-color: $color-three;
+        color: #fff !important;
     }
     &.dark-style {
-        border-color: #000;
-        color: #000;
+        border-color: #fff;
+        color: #fff !important;
         &:hover {
             background: $color-three;
             border-color: $color-three;
-            color: #fff;
+            color: #fff !important;
         }
     }
 }
@@ -349,31 +410,37 @@
 }
 /*----- For Desktop -------*/
 @media screen and (min-width: 992px) {
-.navbar .dropdown-menu {
-    font-size: 1em;
-	z-index: 5;
-	background-color: #fff;
-	border-radius: 10px;
-	display: block;
-	right: auto;
-	left: 0;
-	padding: 10px 5px;
-	border: none;
-	top: 100%;
-	visibility: hidden;
-	transform: translateY(5px);
-	opacity: 0;
-	min-width: 180px;
-	box-shadow: 0px 50px 100px rgba(0, 0, 0, 0.12);
-	margin: 0;
-	transform-origin: 0 0;
-	transition: all 0.3s ease-out;
-    &:before {
-        content: url(../images/icon/icon_62.svg);
-        position: absolute;
-        left: 30px;
-        top:-17px;
+    .logo {
+      img {
+        width: 160px !important;
+        height: auto;
+      }
     }
+    .navbar .dropdown-menu {
+        font-size: 1em;
+        z-index: 5;
+        background-color: #fff;
+        border-radius: 10px;
+        display: block;
+        right: auto;
+        left: 0;
+        padding: 10px 5px;
+        border: none;
+        top: 100%;
+        visibility: hidden;
+        transform: translateY(5px);
+        opacity: 0;
+        min-width: 180px;
+        box-shadow: 0px 50px 100px rgba(0, 0, 0, 0.12);
+        margin: 0;
+        transform-origin: 0 0;
+        transition: all 0.3s ease-out;
+        &:before {
+            content: url(../images/icon/icon_62.svg);
+            position: absolute;
+            left: 30px;
+            top:-17px;
+        }
     }
     .navbar .dropdown-menu .dropdown-menu {
         left: calc(100% + 5px);
@@ -392,13 +459,18 @@
         display: none;
     }
     .navbar .show.dropdown-toggle::after {transform: rotate(180deg);}
-
 }
 
 /*----- For Mobile ----*/
 @media screen and (max-width: 991px) {
     .navbar {padding: 0;}
-    .navbar-collapse .logo {margin-bottom: 8vh;}
+    .navbar-collapse .logo {
+      margin-bottom: 8vh;
+      img {
+        width: 240px !important;
+        height: auto;
+      }
+    }
     .menu-style-one .navbar-collapse,
     .menu-style-two .navbar-collapse {background-color: #255741;}
     .navbar-collapse {
@@ -420,9 +492,19 @@
     }
     .navbar-collapse.show {transform: translateX(0); box-shadow: 15px 0 25px rgba(35,35,35,0.09);}
     .theme-main-menu .navbar .mega-dropdown {position: relative;}
-    .navbar .navbar-nav .nav-link {margin: 0; padding: 13px 0;}
-    .navbar .dropdown-menu .dropdown-item {padding: 0 10px; line-height: 42px;}
-    .navbar .dropdown-menu .dropdown-item.dropdown-toggle {font-weight: 500;}
+    .navbar .navbar-nav .nav-link {
+      margin: 0; 
+      padding: 13px 0;
+      color: #000000 !important;
+      font-weight: 600;
+    }
+    .navbar .dropdown-menu .dropdown-item {
+      padding: 0 10px; 
+      line-height: 42px;
+      color: #000000;
+      font-weight: 500;
+    }
+    .navbar .dropdown-menu .dropdown-item.dropdown-toggle {font-weight: 600;}
     .navbar .dropdown-menu {
         border: none;
         padding: 0;
@@ -441,5 +523,5 @@
         top:calc(50% - 2px);
     }
     .dashboard-menu .nav-link::before {right: auto; left: 0; top:-2px;}
-  }
+}
   /*(max-width: 991px)*/

@@ -122,7 +122,7 @@
             font-size: 11px;
             font-weight: 500;
             margin: 0;
-            color: rgba($color: #244034, $alpha: 0.5);
+            color: rgba($color: #166a9a, $alpha: 0.5);
         }
     }
     .logout-btn {
@@ -331,7 +331,7 @@
         }
         .job-post-btn {
             font-weight: 500;
-            color: #fff;
+            color: #fff !important;
             text-align: center;
             width: 135px;
             line-height: 45px;
@@ -339,7 +339,7 @@
             background: $color-one;
             &:hover {
                 background: $color-two;
-                color: $color-one;
+                color: #fff !important;
             }
         }
         .dash-mobile-nav-toggler {
@@ -479,7 +479,7 @@
                 }
                 .meta {
                     font-size: 14px;
-                    color: rgba($color: #244034, $alpha: 0.5);
+                    color: rgba($color: #166a9a, $alpha: 0.5);
                 }
             }
             .job-action {
@@ -874,7 +874,7 @@
             padding: 12px 15px;
             font-size: 15px;
             font-weight: 500;
-            color: #244034;
+            color: #166a9a;
             background: #F0F5F3;
             &:first-child {
                 border-radius: 7px 0 0 7px;
@@ -893,7 +893,7 @@
             border-bottom: 1px solid rgba($color: #000, $alpha: 0.1);
             &:nth-child(1) {
                 font-weight: 500;
-                color: #244034;
+                color: #166a9a;
             }
             &:nth-child(2) .job-type {
                 color: #00CB74;
@@ -1207,7 +1207,7 @@
                 }
                 .time {
                     font-size: 13px;
-                    color: rgba($color: #244034, $alpha: 0.6);
+                    color: rgba($color: #166a9a, $alpha: 0.6);
                     margin-bottom: 15px;
                 }
             }

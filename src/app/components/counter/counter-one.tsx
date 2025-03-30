@@ -9,23 +9,23 @@ const counter_data: {
   subtitle: string;
 }[] = [
   {
-    id: 1,
-    number: 7,
-    title: "million",
-    subtitle: "Completed Jobs",
+    "id": 1,
+    "number": 7,
+    "title": "million",
+    "subtitle": "Jobs Matched with AI Precision"
   },
   {
-    id: 2,
-    number: 30,
-    title: "k+",
-    subtitle: "Worldwide Client",
+    "id": 2,
+    "number": 30,
+    "title": "k+",
+    "subtitle": "Global Employers Connected"
   },
   {
-    id: 3,
-    number: 13,
-    title: "billion",
-    subtitle: "Dollar Payout",
-  },
+    "id": 3,
+    "number": 13,
+    "title": "billion",
+    "subtitle": "Dollar Value in Career Growth"
+  }
 ];
 
 const CounterOne = ({

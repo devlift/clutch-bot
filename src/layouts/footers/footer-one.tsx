@@ -2,9 +2,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 // internal
-import logo from "@/assets/images/logo/logo_03.png";
-import logo_2 from "@/assets/images/logo/logo_04.png";
-import logo_w from "@/assets/images/logo/logo_06.png";
+import logo from "@/assets/images/logo/logo_04.png";
 import shape from "@/assets/images/shape/shape_28.svg";
 import { WidgetOne, WidgetThree, WidgetTwo } from "./component/footer-widgets";
 import SocialLinks from "./component/social-links";
@@ -26,7 +24,8 @@ const FooterOne = ({
 						<div className="col-lg-2 col-md-3 footer-intro mb-15">
 							<div className="logo mb-15">
 								<Link href="/" className="d-flex align-items-center">
-									<Image src={style_2 ? logo_w : style_3 ? logo_2 : logo} alt="logo" priority />
+								<Image src={logo} width={130} alt="logo" priority />
+							
 								</Link>
 							</div>
 							<Image
@@ -82,7 +81,7 @@ const FooterOne = ({
 						</div>
 						<div className="col-lg-4 order-lg-2">
 							<p className={`text-center mb-15 ${style_2 ? "text-white" : ""}`}>
-								Copyright @{new Date().getFullYear()} jobi inc.
+								Copyright @{new Date().getFullYear()} Clutch Jobs inc.
 							</p>
 						</div>
 					</div>

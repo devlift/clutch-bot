@@ -66,7 +66,7 @@ const FeatureOne = () => {
           <div className="col-lg-5 order-lg-last">
             <div className="ps-xxl-4 wow fadeInRight">
               <div className="title-one">
-                <h2>Get over 50.000+ talented experts in jobi.</h2>
+                <h2>Get over 50.000+ talented experts in Clutch Jobs.</h2>
               </div>
               <p className="mt-40 md-mt-20 mb-40 md-mb-20">
                 A full hybrid workforce management tools are yours to use, as
