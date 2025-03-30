@@ -5,6 +5,7 @@ import banner_2 from '@/assets/images/assets/banner_img_02.jpg';
 import useSearchFormSubmit from '@/hooks/use-search-form-submit';
 import JobCategorySelect from '../select/job-category';
 import CounterOne from '../counter/counter-one';
+import ScrollIndicator from '../common/scroll-indicator';
 
 
 const HeroBannerSix = () => {
@@ -68,6 +69,7 @@ const HeroBannerSix = () => {
           </div> */}
         </div>
       </div>
+      <ScrollIndicator />
     </div>
   );
 };
