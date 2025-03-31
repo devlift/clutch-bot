@@ -1,24 +1,14 @@
 'use client'
 import React from "react";
 import Link from "next/link";
-import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { add_to_wishlist } from "@/redux/features/wishlist";
-import CompanyLogo from "@/app/components/common/CompanyLogo";
 import { Job } from '@/types/job-data-type';
+import CompanyLogo from "@/app/components/common/CompanyLogo";
 
-const ListItem = ({ item, style_2, cls='' }: { item: Job; style_2?: boolean; cls?: string }) => {
-  const { id, employer, createdTime, jobType, location, title } = item;
-  const {wishlist} = useAppSelector(state => state.wishlist);
-  const isActive = wishlist.some(p => p.id === id);
-  const dispatch = useAppDispatch();
-
-  // handle add wishlist
-  const handleAddWishlist = (item: Job) => {
-    dispatch(add_to_wishlist(item));
-  };
+const JobListItem = ({ job }: { job: Job }) => {
+  const { id, employer, createdTime, jobType, location, title } = job;
 
   return (
-    <div className={`job-list-one position-relative ${cls} ${style_2?'border-style mb-20':'bottom-border'}`}>
+    <div className="job-list-one position-relative border-style mb-20">
       <div className="row justify-content-between align-items-center">
         <div className="col-xxl-3 col-lg-4">
           <div className="job-title d-flex align-items-center">
@@ -59,19 +49,8 @@ const ListItem = ({ item, style_2, cls='' }: { item: Job; style_2?: boolean; cls
         </div>
         <div className="col-lg-2 col-md-4 col-sm-6">
           <div className="btn-group d-flex align-items-center justify-content-md-end">
-            {/* Bookmark button hidden for now
-            <button
-              onClick={() => handleAddWishlist(item)}
-              className={`save-btn text-center rounded-circle tran3s ms-3 ${
-                isActive ? "active" : ""
-              }`}
-              title={`${isActive ? "Remove Job" : "Save Job"}`}
-            >
-              <i className="bi bi-bookmark-dash"></i>
-            </button>
-            */}
             <Link href={`/jobs/${id}`} className="apply-btn text-center tran3s">
-              Details
+              DETAILS
             </Link>
           </div>
         </div>
@@ -80,4 +59,4 @@ const ListItem = ({ item, style_2, cls='' }: { item: Job; style_2?: boolean; cls
   );
 };
 
-export default ListItem;
+export default JobListItem; 

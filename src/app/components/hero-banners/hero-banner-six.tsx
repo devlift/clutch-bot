@@ -15,13 +15,13 @@ const HeroBannerSix = () => {
     setSearchText(e.target.value)
   }
   return (
-    <div className="hero-banner-six position-relative pt-170 lg-pt-150 pb-60 lg-pb-40">
+    <div className="hero-banner-six position-relative d-flex align-items-center min-vh-100">
       <div className="container">
         <div className="position-relative">
           <div className="row">
             <div className="col-xxl-8 col-xl-9 col-lg-8 m-auto text-center">
-              <h1 className="wow fadeInUp" data-wow-delay="0.3s">Empowering Your Next Career Move.</h1>
-              <p className="text-md text-white mt-25 mb-55 lg-mb-40 wow fadeInUp" data-wow-delay="0.4s">Discover the future of hiring. Clutch Jobs' AI guides every step, connecting top talent with visionary employers. Your dream job or perfect candidate is just a click away.</p>
+              <h2 className="wow text-white  fadeInUp" data-wow-delay="0.3s">Empowering Your Next Career Move.</h2>
+              <p className=" text-white mt-25 mb-55 lg-mb-40 wow fadeInUp" data-wow-delay="0.4s">Discover the future of hiring. Clutch Jobs' AI guides every step, connecting top talent with visionary employers. Your dream job or perfect candidate is just a click away.</p>
             </div>
           </div>
           <div className="position-relative">
