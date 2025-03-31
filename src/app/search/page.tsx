@@ -62,9 +62,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                     <div className="row justify-content-between align-items-center">
                       <div className="col-lg-6">
                         <div className="title-one">
-                          <h2 className="main-font color-blue wow fadeInUp" data-wow-delay="0.3s">
+                          {/* <h2 className="main-font color-blue wow fadeInUp" data-wow-delay="0.3s">
                             {searchQuery ? `Search Results for "${searchQuery}"` : 'All Jobs'}
-                          </h2>
+                          </h2> */}
                           <p className="text-md mt-12">
                             {typedJobs.length} {typedJobs.length === 1 ? 'job' : 'jobs'} found
                           </p>
