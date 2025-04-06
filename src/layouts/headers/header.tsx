@@ -6,10 +6,40 @@ import Menus from "./component/menus";
 import logo from "@/assets/images/logo/logo_01.png";
 import CategoryDropdown from "./component/category-dropdown";
 import LoginModal from "@/app/components/common/popup/login-modal";
+import AuthWrapper from "@/components/common/auth-wrapper";
 import useSticky from "@/hooks/use-sticky";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 const Header = () => {
-  const {sticky} = useSticky()
+  const {sticky} = useSticky();
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  
+  useEffect(() => {
+    // Check authentication state on component mount
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getUser();
+      setIsLoggedIn(!!data?.user);
+    };
+    
+    checkAuth();
+    
+    // Listen for auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event) => {
+      if (event === 'SIGNED_IN') {
+        setIsLoggedIn(true);
+      } else if (event === 'SIGNED_OUT') {
+        setIsLoggedIn(false);
+      }
+    });
+    
+    return () => {
+      if (authListener && authListener.subscription) {
+        authListener.subscription.unsubscribe();
+      }
+    };
+  }, []);
+  
   return (
     <>
     <header className={`theme-main-menu menu-overlay menu-style-one sticky-menu ${sticky?'fixed':''}`}>
@@ -29,20 +59,15 @@ const Header = () => {
                   </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="login-btn-one"
-                    data-bs-toggle="modal"
-                    data-bs-target="#loginModal"
-                  >
-                    Login
-                  </a>
+                  <AuthWrapper />
                 </li>
-                <li className="d-none d-md-block ms-4">
-                  <Link href="/candidates-v1" className="btn-one">
-                    Hire Top Talents
-                  </Link>
-                </li>
+                {!isLoggedIn && (
+                  <li className="d-none d-md-block ms-4">
+                    <Link href="/register" className="btn-five">
+                      Register
+                    </Link>
+                  </li>
+                )}
               </ul>
             </div>
             <nav className="navbar navbar-expand-lg p0 ms-lg-5 ms-3 order-lg-2">
@@ -89,11 +114,13 @@ const Header = () => {
                       Post Job
                     </Link>
                   </li>
-                  <li className="d-md-none">
-                    <Link href="/candidates-v1" className="btn-one w-100">
-                      Hire Top Talents
-                    </Link>
-                  </li>
+                  {!isLoggedIn && (
+                    <li className="d-md-none">
+                      <Link href="/register" className="btn-five w-100">
+                        Register
+                      </Link>
+                    </li>
+                  )}
                 </ul>
               </div>
             </nav>

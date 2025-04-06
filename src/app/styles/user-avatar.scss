@@ -1,0 +1,133 @@
+// User Avatar Component Styles
+
+.user-avatar-container {
+  position: relative;
+}
+
+.user-avatar {
+  cursor: pointer;
+  padding: 5px;
+}
+
+.avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: #75a441;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.avatar-popover {
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  width: 240px;
+  background: #1a1a1a;
+  border-radius: 4px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  z-index: 1000;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease;
+  color: white;
+}
+
+.popover-menu {
+  padding: 8px 0;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  color: white;
+  text-decoration: none;
+  transition: background 0.2s;
+  gap: 12px;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  
+  &:hover {
+    background: #2c2c2c;
+  }
+  
+  i {
+    font-size: 18px;
+    color: #ccc;
+  }
+}
+
+.menu-divider {
+  height: 1px;
+  background-color: #333;
+  margin: 8px 0;
+}
+
+.sign-out {
+  color: white;
+  
+  i {
+    color: #ccc;
+  }
+}
+
+.user-profile {
+  display: flex;
+  padding: 16px;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-circle-large {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  border-radius: 50%;
+  background-color: #75a441;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.user-details {
+  h6 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: white;
+  }
+}
+
+.team-name {
+  margin: 0;
+  font-size: 14px;
+  color: #4cd964;
+}
+
+.team-value {
+  color: #999;
+  margin-left: 4px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

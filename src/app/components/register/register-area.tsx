@@ -1,26 +1,36 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import Image from "next/image";
 import RegisterForm from "../forms/register-form";
 import google from "@/assets/images/icon/google.png";
 import facebook from "@/assets/images/icon/facebook.png";
 
 const RegisterArea = () => {
+  const [activeTab, setActiveTab] = useState<"candidate" | "employer">("candidate");
+
+  const handleTabChange = (tabType: "candidate" | "employer") => {
+    console.log("Switching to tab:", tabType);
+    setActiveTab(tabType);
+  };
+
   return (
     <section className="registration-section position-relative pt-100 lg-pt-80 pb-150 lg-pb-80">
       <div className="container">
         <div className="user-data-form">
           <div className="text-center">
             <h2>Create Account</h2>
+            <p className="mt-10">Select an account type and enter your details to get started</p>
           </div>
           <div className="form-wrapper m-auto">
             <ul className="nav nav-tabs border-0 w-100 mt-30" role="tablist">
               <li className="nav-item" role="presentation">
                 <button
-                  className="nav-link active"
+                  className={`nav-link ${activeTab === "candidate" ? "active" : ""}`}
+                  onClick={() => handleTabChange("candidate")}
                   data-bs-toggle="tab"
                   data-bs-target="#fc1"
                   role="tab"
-                  aria-selected="true"
+                  aria-selected={activeTab === "candidate"}
                   tabIndex={-1}
                 >
                   Candidates
@@ -28,11 +38,12 @@ const RegisterArea = () => {
               </li>
               <li className="nav-item" role="presentation">
                 <button
-                  className="nav-link"
+                  className={`nav-link ${activeTab === "employer" ? "active" : ""}`}
+                  onClick={() => handleTabChange("employer")}
                   data-bs-toggle="tab"
                   data-bs-target="#fc2"
                   role="tab"
-                  aria-selected="false"
+                  aria-selected={activeTab === "employer"}
                   tabIndex={-1}
                 >
                   Employer
@@ -41,14 +52,18 @@ const RegisterArea = () => {
             </ul>
             <div className="tab-content mt-40">
               <div
-                className="tab-pane fade show active"
+                className={`tab-pane fade ${activeTab === "candidate" ? "show active" : ""}`}
                 role="tabpanel"
                 id="fc1"
               >
-                <RegisterForm />
+                <RegisterForm userType="candidate" />
               </div>
-              <div className="tab-pane fade" role="tabpanel" id="fc2">
-                <RegisterForm />
+              <div 
+                className={`tab-pane fade ${activeTab === "employer" ? "show active" : ""}`} 
+                role="tabpanel" 
+                id="fc2"
+              >
+                <RegisterForm userType="employer" />
               </div>
             </div>
 
@@ -71,10 +86,8 @@ const RegisterArea = () => {
             <p className="text-center mt-10">
               Have an account?{" "}
               <a
-                href="#"
+                href="/login"
                 className="fw-500"
-                data-bs-toggle="modal"
-                data-bs-target="#loginModal"
               >
                 Sign In
               </a>

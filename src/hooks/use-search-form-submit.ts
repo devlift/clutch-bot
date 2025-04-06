@@ -17,7 +17,7 @@ const useSearchFormSubmit = () => {
     }
 
     if (searchText) {
-      queryParams.push(`search=${searchText}`);
+      queryParams.push(`q=${searchText}`);
     }
 
     if (company) {

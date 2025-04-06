@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import localFont from 'next/font/local';
 import { EB_Garamond } from "next/font/google";
 import BackToTopCom from "./components/common/back-to-top-com";
+import ChatWidget from "./components/common/chat-widget";
 import { Providers } from "@/redux/provider";
 
 const gordita = localFont({
@@ -63,6 +64,7 @@ export default function RootLayout({
           {children}
         </Providers>
         <BackToTopCom />
+        <ChatWidget />
       </body>
     </html>
   );

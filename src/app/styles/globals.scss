@@ -1,0 +1,103 @@
+// Add the custom styles for the terms checkbox
+
+// Styled checkbox for terms agreement
+.terms-checkbox {
+  margin-top: 20px;
+  margin-bottom: 25px;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #f7f9f3; // Light green background
+  border: 1px solid rgba(117, 164, 65, 0.15);
+  
+  .checkbox-wrapper {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  .styled-checkbox {
+    position: absolute;
+    opacity: 0;
+    
+    & + .checkbox-label {
+      position: relative;
+      cursor: pointer;
+      padding-left: 36px; // Increase padding for larger checkbox
+      font-size: 14px;
+      line-height: 1.6;
+      color: #444;
+      font-weight: 500;
+      
+      &:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 2px;
+        width: 24px; // Larger checkbox
+        height: 24px; // Larger checkbox
+        border: 2px solid #b0c991; // Lighter green border
+        border-radius: 5px;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
+      }
+      
+      &:after {
+        content: '';
+        position: absolute;
+        left: 9px;
+        top: 12px;
+        width: 6px;
+        height: 11px; // Taller checkmark
+        border: solid white;
+        border-width: 0 2px 2px 0; // Right and bottom borders for checkmark
+        transform: rotate(45deg) scale(0); // Rotate for checkmark shape
+        opacity: 0;
+        transition: all 0.2s cubic-bezier(0.2, 0.85, 0.32, 1.2); // Bouncy animation
+      }
+    }
+    
+    &:hover + .checkbox-label:before {
+      border-color: #75a441;
+      box-shadow: 0 1px 5px rgba(117, 164, 65, 0.3);
+    }
+    
+    &:checked + .checkbox-label:before {
+      background: #75a441;
+      border-color: #75a441;
+    }
+    
+    &:checked + .checkbox-label:after {
+      transform: rotate(45deg) scale(1);
+      opacity: 1;
+    }
+    
+    &:focus + .checkbox-label:before {
+      box-shadow: 0 0 0 4px rgba(117, 164, 65, 0.25);
+    }
+  }
+  
+  .terms-link {
+    color: #166a9a;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid #c5d9e5;
+    transition: all 0.2s ease;
+    padding-bottom: 1px;
+    
+    &:hover {
+      color: #0e4a6c;
+      border-bottom-color: #166a9a;
+    }
+  }
+  
+  .required-indicator {
+    color: #e74c3c;
+    font-weight: bold;
+  }
+  
+  .help-block {
+    margin-top: 8px;
+    margin-left: 36px; // Align with text
+  }
+} 

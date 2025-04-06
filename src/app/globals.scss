@@ -3,3 +3,7 @@
 @import 'react-toastify/dist/ReactToastify.css';
 @import "~slick-carousel/slick/slick.css";
 @import '/public/assets/scss/style.scss';
+
+// Custom component styles
+@import './styles/chat-widget.scss';
+@import "./styles/user-avatar.scss";

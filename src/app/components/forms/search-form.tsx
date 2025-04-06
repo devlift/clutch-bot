@@ -1,11 +1,32 @@
+"use client"
 import React from "react";
 import useSearchFormSubmit from "@/hooks/use-search-form-submit";
+import { useSearchParams } from 'next/navigation';
 
 const SearchForm = () => {
+  const searchParams = useSearchParams();
   const { handleSubmit, setSearchText } = useSearchFormSubmit();
+  const [inputValue, setInputValue] = React.useState('');
+
+  // Set initial value from URL on mount and when URL changes
+  React.useEffect(() => {
+    const searchQuery = searchParams.get('q') || '';
+    console.log('SearchForm: URL query param:', searchQuery);
+    setInputValue(searchQuery);
+    setSearchText(searchQuery);
+  }, [searchParams, setSearchText]);
 
   const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value);
+    const newValue = e.target.value;
+    console.log('SearchForm: Input changed:', newValue);
+    setInputValue(newValue);
+    setSearchText(newValue);
+  };
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('SearchForm: Submitting search with value:', inputValue);
+    handleSubmit(e);
   };
 
   return (
@@ -30,10 +51,11 @@ const SearchForm = () => {
             fontSize: '16px',
             paddingLeft: '4px'
           }}
+          value={inputValue}
         />
       </div>
       <button 
-        onClick={handleSubmit}
+        onClick={onSubmit}
         className="border-0 d-flex align-items-center justify-content-center" 
         style={{ 
           backgroundColor: '#87B441',

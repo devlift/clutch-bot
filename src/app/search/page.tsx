@@ -18,13 +18,13 @@ interface SearchPageProps {
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const headersList = headers();
-  const cookieStore = cookies();
-
   try {
+    console.log('Search page params:', searchParams);
+    const cookieStore = cookies();
     const supabase = createServerComponentClient({ cookies: () => cookieStore });
     const searchParamsQ = searchParams.q;
     const searchQuery = typeof searchParamsQ === 'string' ? searchParamsQ : '';
+    console.log('Search query:', searchQuery);
 
     // Fetch jobs with search
     let query = supabase
@@ -35,10 +35,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       `);
 
     if (searchQuery) {
-      query = query.textSearch('fts', searchQuery, {
-        type: 'websearch',
-        config: 'english'
-      });
+      console.log('Applying search filter for:', searchQuery);
+      // Use full text search across all fields
+      query = query.or(
+        `title.ilike.%${searchQuery}%,` +
+        `description.ilike.%${searchQuery}%,` +
+        `location.ilike.%${searchQuery}%,` +
+        `jobType.ilike.%${searchQuery}%`
+      );
     }
 
     const { data: jobs, error } = await query;
@@ -48,6 +52,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       throw error;
     }
 
+    console.log('Jobs found:', jobs?.length || 0);
     const typedJobs = (jobs || []) as Job[];
 
     return (

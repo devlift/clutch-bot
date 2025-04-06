@@ -6,14 +6,27 @@ import useSearchFormSubmit from '@/hooks/use-search-form-submit';
 import JobCategorySelect from '../select/job-category';
 import CounterOne from '../counter/counter-one';
 import ScrollIndicator from '../common/scroll-indicator';
-
+import { useSearchParams } from 'next/navigation';
 
 const HeroBannerSix = () => {
+  const searchParams = useSearchParams();
   const { handleSubmit, setSearchText } = useSearchFormSubmit();
+  const [inputValue, setInputValue] = React.useState('');
+  
+  // Set initial value from URL on mount
+  React.useEffect(() => {
+    const searchQuery = searchParams.get('q') || '';
+    setInputValue(searchQuery);
+    setSearchText(searchQuery);
+  }, [searchParams, setSearchText]);
+
   // handleSearchInput
-  const handleSearchInput = (e:React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value)
+  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    setSearchText(newValue);
   }
+
   return (
     <div className="hero-banner-six position-relative d-flex align-items-center min-vh-100">
       <div className="container">
@@ -39,6 +52,7 @@ const HeroBannerSix = () => {
                             placeholder="Construction Jobs in Toronto" 
                             className="keyword w-100" 
                             style={{ width: '100%' }}
+                            value={inputValue}
                           />
                         </div>
                       </div>

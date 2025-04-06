@@ -7,11 +7,40 @@ import Menus from "./component/menus";
 import logo from "@/assets/images/logo/logo_04.png";
 import useSticky from "@/hooks/use-sticky";
 import LoginModal from "@/app/components/common/popup/login-modal";
+import AuthWrapper from "@/components/common/auth-wrapper";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 const HeaderTwo = () => {
   const {sticky} = useSticky();
   const pathname = usePathname();
   const isJobsPage = pathname?.includes('job-grid') || pathname?.includes('job-details');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  
+  useEffect(() => {
+    // Check authentication state on component mount
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getUser();
+      setIsLoggedIn(!!data?.user);
+    };
+    
+    checkAuth();
+    
+    // Listen for auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event) => {
+      if (event === 'SIGNED_IN') {
+        setIsLoggedIn(true);
+      } else if (event === 'SIGNED_OUT') {
+        setIsLoggedIn(false);
+      }
+    });
+    
+    return () => {
+      if (authListener && authListener.subscription) {
+        authListener.subscription.unsubscribe();
+      }
+    };
+  }, []);
   
   return (
     <>
@@ -21,26 +50,21 @@ const HeaderTwo = () => {
           <div className="d-flex align-items-center justify-content-between">
             <div className="logo order-lg-0">
               <Link href="/" className="d-flex align-items-center">
-                <Image src={logo} width={120} alt="logo" priority />
+                <Image src={logo} width={150} alt="logo" priority />
               </Link>
             </div>
             <div className="right-widget ms-auto ms-lg-0 order-lg-3">
               <ul className="d-flex align-items-center style-none">
                 <li>
-                  <a
-                    href="#"
-                    className="fw-500 text-dark"
-                    data-bs-toggle="modal"
-                    data-bs-target="#loginModal"
-                  >
-                    Login
-                  </a>
+                  <AuthWrapper />
                 </li>
-                <li className="d-none d-md-block ms-4">
-                  <Link href="/register" className="btn-five">
-                    Register
-                  </Link>
-                </li>
+                {!isLoggedIn && (
+                  <li className="d-none d-md-block ms-4">
+                    <Link href="/register" className="btn-five">
+                      Register
+                    </Link>
+                  </li>
+                )}
               </ul>
             </div>
             <nav className="navbar navbar-expand-lg p0 ms-3 ms-lg-0 order-lg-2">
@@ -60,16 +84,18 @@ const HeaderTwo = () => {
                   <li className="d-block d-lg-none">
                     <div className="logo">
                       <Link href="/" className="d-block">
-                        <Image src={logo} alt="logo" width={120} priority />
+                        <Image src={logo} alt="logo" width={150} priority />
                       </Link>
                     </div>
                   </li>
                   <Menus />
-                  <li className="d-md-none mt-5">
-                    <Link href="/register" className="btn-five w-100">
-                      Register
-                    </Link>
-                  </li>
+                  {!isLoggedIn && (
+                    <li className="d-md-none mt-5">
+                      <Link href="/register" className="btn-five w-100">
+                        Register
+                      </Link>
+                    </li>
+                  )}
                 </ul>
               </div>
             </nav>
