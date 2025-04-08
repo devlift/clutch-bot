@@ -7,3 +7,218 @@
 // Custom component styles
 @import './styles/chat-widget.scss';
 @import "./styles/user-avatar.scss";
+
+/* Interview Modal Styles */
+.modal-backdrop.show {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  .modal-dialog {
+    margin: 0;
+    max-width: 800px;
+    width: 90%;
+    z-index: 10000;
+  }
+  
+  .modal-content {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: none;
+    opacity: 1 !important;
+  }
+  
+  .modal-header {
+    background-color: #166a9a;
+    color: white;
+    border-radius: 12px 12px 0 0;
+    padding: 15px 20px;
+    
+    .modal-title {
+      color: white;
+      font-weight: 500;
+      font-size: 1.25rem;
+    }
+    
+    .btn-close {
+      color: white;
+      filter: brightness(0) invert(1);
+      opacity: 1;
+    }
+  }
+  
+  .modal-body {
+    padding: 25px;
+    background-color: #ffffff;
+  }
+  
+  .modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 15px 20px;
+    background-color: #ffffff;
+  }
+}
+
+/* Interview Modal - completely opaque */
+.interview-modal-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000000;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.interview-modal-dialog {
+  margin: 0;
+  max-width: 800px;
+  width: 90%;
+  z-index: 10000;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.interview-modal-header {
+  background-color: #166a9a;
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.interview-modal-title {
+  color: white;
+  font-weight: 500;
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.interview-modal-close {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.interview-modal-body {
+  padding: 25px;
+  background-color: #ffffff;
+}
+
+.interview-modal-footer {
+  border-top: 1px solid #e9ecef;
+  padding: 15px 20px;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.webcam-container {
+  position: relative;
+  
+  .webcam-feed {
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .question-header {
+    margin-top: 15px;
+    
+    .badge {
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+  }
+  
+  .question-text {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #75a441;
+    
+    h5 {
+      margin-bottom: 0;
+      font-weight: 500;
+    }
+  }
+  
+  .interview-intro {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    
+    h4 {
+      color: #166a9a;
+      margin-bottom: 15px;
+    }
+    
+    ol {
+      padding-left: 20px;
+      margin-bottom: 20px;
+      
+      li {
+        margin-bottom: 10px;
+      }
+    }
+  }
+}
+
+// Add device status icon styles
+.device-status-icon {
+  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  
+  &.text-success {
+    color: #28a745;
+    background-color: rgba(40, 167, 69, 0.1);
+  }
+  
+  &.text-warning {
+    color: #ffc107;
+    background-color: rgba(255, 193, 7, 0.1);
+  }
+  
+  &.text-danger {
+    color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+  }
+}
+
+.video-test-container {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}

@@ -36,12 +36,21 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ user, userName }) => {
   
   // Handle user sign out
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Error signing out:', error);
-    } else {
-      // Redirect to home page or refresh
-      window.location.href = '/';
+    try {
+      console.log('Signing out user...');
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Error signing out:', error);
+        alert('Failed to sign out. Please try again.');
+      } else {
+        console.log('Sign out successful, redirecting...');
+        // Force a page reload to update all UI components
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error('Unexpected error during sign out:', err);
+      alert('An unexpected error occurred. Please try again.');
     }
   };
   

@@ -186,25 +186,6 @@
         -webkit-transform: rotate3d(0, 0, 1, -45deg);
         transform: rotate3d(0, 0, 1, -45deg);
     }
-
-    .navbar {
-        position: static;
-        
-        @media (min-width: 992px) {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: auto;
-        }
-        
-        .navbar-nav {
-            @media (min-width: 992px) {
-                margin: 0 auto;
-                display: flex;
-                justify-content: center;
-            }
-        }
-    }
 }
 // Main Menu
 .navbar .nav-item .nav-link {

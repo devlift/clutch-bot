@@ -45,13 +45,32 @@ const Header = () => {
     <header className={`theme-main-menu menu-overlay menu-style-one sticky-menu ${sticky?'fixed':''}`}>
       <div className="inner-content position-relative">
         <div className="top-header">
-          <div className="d-flex align-items-center justify-content-between">
+          <div className="d-flex align-items-center">
             <div className="logo order-lg-0">
               <Link href="/" className="d-flex align-items-center">
                 <Image src={logo} width={300} alt="logo" priority />
               </Link>
             </div>
-            <nav className="navbar navbar-expand-lg p0 order-lg-1 mx-auto">
+            <div className="right-widget ms-auto ms-lg-0 order-lg-3" style={{ minWidth: '64px' }}>
+              <ul className="d-flex align-items-center style-none">
+                <li className="d-none d-md-block">
+                  <Link href="/register" className="job-post-btn tran3s">
+                    Post Job
+                  </Link>
+                </li>
+                <li>
+                  <AuthWrapper />
+                </li>
+                {!isLoggedIn && (
+                  <li className="d-none d-md-block ms-4">
+                    <Link href="/register" className="btn-five">
+                      Register
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            </div>
+            <nav className="navbar navbar-expand-lg p0 ms-lg-5 ms-3 order-lg-2">
               <button
                 className="navbar-toggler d-block d-lg-none"
                 type="button"
@@ -64,13 +83,28 @@ const Header = () => {
                 <span></span>
               </button>
               <div className="collapse navbar-collapse" id="navbarNav">
-                <ul className="navbar-nav align-items-lg-center justify-content-center">
+                <ul className="navbar-nav align-items-lg-center">
                   <li className="d-block d-lg-none">
                     <div className="logo">
                       <Link href="/" className="d-block">
                         <Image src={logo} alt="logo" width={100} priority />
                       </Link>
                     </div>
+                  </li>
+                  <li className="nav-item dropdown category-btn mega-dropdown-sm">
+                    <a
+                      className="nav-link dropdown-toggle"
+                      href="#"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      data-bs-auto-close="outside"
+                      aria-expanded="false"
+                    >
+                      <i className="bi bi-grid-fill"></i> Category
+                    </a>
+                    {/* CategoryDropdown start */}
+                    <CategoryDropdown />
+                    {/* CategoryDropdown end */}
                   </li>
                   {/* menus start */}
                   <Menus />
@@ -90,25 +124,6 @@ const Header = () => {
                 </ul>
               </div>
             </nav>
-            <div className="right-widget order-lg-2">
-              <ul className="d-flex align-items-center style-none">
-                <li className="d-none d-md-block">
-                  <Link href="/register" className="job-post-btn tran3s">
-                    Post Job
-                  </Link>
-                </li>
-                <li>
-                  <AuthWrapper />
-                </li>
-                {!isLoggedIn && (
-                  <li className="d-none d-md-block ms-4">
-                    <Link href="/register" className="btn-five">
-                      Register
-                    </Link>
-                  </li>
-                )}
-              </ul>
-            </div>
           </div>
         </div>
       </div>

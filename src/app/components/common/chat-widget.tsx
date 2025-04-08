@@ -6,6 +6,7 @@ import { useChatWebSocket } from "@/hooks/useChatWebSocket";
 import ReactMarkdown from 'react-markdown';
 import { supabase } from "@/lib/supabase";
 import CreateJobModal from '../modals/create-job-modal';
+import InterviewModal from './interview-modal';
 
 interface FileItem {
   name: string;
@@ -87,8 +88,18 @@ const ChatWidget = () => {
   const [showJobModal, setShowJobModal] = useState(false);
   const [jobDetails, setJobDetails] = useState<JobDetailsOutput | null>(null);
 
+  // Add state for interview modal and questions
+  const [showInterviewModal, setShowInterviewModal] = useState(false);
+  const [interviewQuestions, setInterviewQuestions] = useState<string[]>([]);
+
+  // Add a state for typing indicator
+  const [isTyping, setIsTyping] = useState(false);
+
   // --- WebSocket Integration --- 
   const handleMessageStream = useCallback((streamedMessage: string) => {
+    // Hide typing indicator when we start receiving a response
+    setIsTyping(false);
+    
     setMessages(prevMessages => {
       if (prevMessages.length === 0) return prevMessages;
 
@@ -119,6 +130,9 @@ const ChatWidget = () => {
 
   const handleWebSocketError = useCallback((event: Event) => {
     console.error("WebSocket Error:", event);
+    
+    // Hide typing indicator on error
+    setIsTyping(false);
     
     setReconnectAttempts(prev => {
       const newCount = prev + 1;
@@ -169,7 +183,49 @@ const ChatWidget = () => {
           output: processedOutput
         }
       }]);
+    } 
+    else if (toolName === 'start_interview') {
+      // Process the interview questions
+      let questions: string[] = [];
+      
+      // Check if output is an array or convert it to an array
+      if (Array.isArray(output)) {
+        questions = output;
+      } else if (typeof output === 'object' && output.questions && Array.isArray(output.questions)) {
+        questions = output.questions;
+      } else if (typeof output === 'string') {
+        try {
+          // Try to parse as JSON if it's a string
+          const parsed = JSON.parse(output);
+          questions = Array.isArray(parsed) ? parsed : 
+                    (parsed.questions && Array.isArray(parsed.questions)) ? parsed.questions : [];
+        } catch (e) {
+          // If not parseable JSON, split by newlines and filter empty lines
+          questions = output.split('\n').filter(q => q.trim() !== '');
+        }
+      }
+      
+      // Store the interview questions
+      setInterviewQuestions(questions);
+      
+      // Add a message with the button to start the interview
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        text: "I've prepared interview questions based on the job description. Would you like to start the video interview now?",
+        sender: "bot",
+        isStreaming: false,
+        toolOutput: {
+          tool: toolName,
+          output: questions
+        }
+      }]);
     }
+  }, []);
+
+  // Add this function to handle messages complete
+  const handleMessageComplete = useCallback(() => {
+    // Ensure typing indicator is hidden when message is complete
+    setIsTyping(false);
   }, []);
 
   const {
@@ -180,10 +236,10 @@ const ChatWidget = () => {
   } = useChatWebSocket({
     url: WEBSOCKET_URL,
     onMessageStream: handleMessageStream,
-    onCompleteMessage: () => {}, // Empty function as we're not using it
+    onCompleteMessage: handleMessageComplete, // Add the complete handler
     onError: handleWebSocketError,
     getAuthToken: getSupabaseAuthToken,
-    onToolCallOutput: handleToolCallOutput // Add the new callback
+    onToolCallOutput: handleToolCallOutput
   });
 
   // Implement connection with backoff
@@ -279,6 +335,9 @@ const ChatWidget = () => {
     
     setInputValue("");
     setSelectedFiles([]);
+
+    // Show typing indicator
+    setIsTyping(true);
 
     // Send the text message via WebSocket
     sendWebSocketMessage({ text });
@@ -422,7 +481,7 @@ const ChatWidget = () => {
     return false;
   }, [wsStatus, sendWebSocketMessage]);
 
-  // Add listener for custom events to open the chat widget and send silent messages
+  // Add event listeners
   useEffect(() => {
     // Handler for opening the chat widget
     const handleOpenChatWidget = () => {
@@ -498,14 +557,73 @@ const ChatWidget = () => {
       }, 1000);
     };
 
+    // Handler for starting an interview
+    const handleStartInterview = (event: CustomEvent<{messageId: string, jobTitle: string}>) => {
+      const { messageId, jobTitle } = event.detail;
+      
+      // If chat is closed, open it first
+      if (!isOpen) {
+        setIsOpen(true);
+        attemptConnection();
+      }
+      
+      // Function to send the interview request
+      const trySendInterviewRequest = () => {
+        if (wsStatus === 'open') {
+          console.log('Sending interview request through WebSocket');
+          // Send a message to trigger the start_interview tool
+          sendWebSocketMessage({ 
+            text: `Start a video interview for the ${jobTitle} position with screening questions.` 
+          });
+          
+          // This will be handled by the AI which should trigger the start_interview tool
+          // Report success
+          document.dispatchEvent(new CustomEvent('interviewRequestSent', { 
+            detail: { messageId } 
+          }));
+          return true;
+        }
+        return false;
+      };
+      
+      // Try to send with similar retry logic as silent messages
+      setTimeout(() => {
+        if (trySendInterviewRequest()) return;
+        
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        const interval = setInterval(() => {
+          attempts++;
+          
+          console.log(`Connection status for interview: ${wsStatus}, attempt ${attempts}/${maxAttempts}`);
+          
+          if (trySendInterviewRequest()) {
+            clearInterval(interval);
+          } 
+          else if (attempts >= maxAttempts) {
+            document.dispatchEvent(new CustomEvent('interviewRequestFailed', { 
+              detail: { 
+                messageId,
+                error: 'Connection not established for interview request' 
+              } 
+            }));
+            clearInterval(interval);
+          }
+        }, 500);
+      }, 1000);
+    };
+
     // Add event listeners
     window.addEventListener('openChatWidget', handleOpenChatWidget);
     window.addEventListener('sendSilentChatMessage', handleSilentMessage as EventListener);
+    document.addEventListener('startInterview', handleStartInterview as EventListener);
 
     // Remove event listeners on cleanup
     return () => {
       window.removeEventListener('openChatWidget', handleOpenChatWidget);
       window.removeEventListener('sendSilentChatMessage', handleSilentMessage as EventListener);
+      document.removeEventListener('startInterview', handleStartInterview as EventListener);
     };
   }, [isOpen, attemptConnection, wsStatus, sendWebSocketMessage]);
 
@@ -516,6 +634,12 @@ const ChatWidget = () => {
     } else {
       console.error("No job details available");
     }
+  };
+
+  // Add function to handle opening the interview modal
+  const handleOpenInterviewModal = () => {
+    // Simply open the modal - we'll generate questions dynamically
+    setShowInterviewModal(true);
   };
 
   return (
@@ -581,6 +705,16 @@ const ChatWidget = () => {
                           </button>
                         </div>
                       )}
+                      {message.toolOutput?.tool === 'start_interview' && (
+                        <div className="mt-3">
+                          <button 
+                            className="btn theme-btn btn-sm"
+                            onClick={handleOpenInterviewModal}
+                          >
+                            Start Interview
+                          </button>
+                        </div>
+                      )}
                     </>
                   ) : (
                     <p>{typeof message.text === 'string' ? message.text : ''}</p>
@@ -609,14 +743,15 @@ const ChatWidget = () => {
                 )}
               </div>
             ))}
-             {/* Add a typing indicator */}
-             {messages[messages.length - 1]?.isStreaming && (
-                 <div className="message bot">
-                     <div className="message-content typing-indicator">
-                         <span></span><span></span><span></span>
-                     </div>
-                 </div>
-             )}
+            
+            {/* Show typing indicator when waiting for response */}
+            {isTyping && (
+              <div className="message bot">
+                <div className="message-content typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
 
@@ -703,6 +838,15 @@ const ChatWidget = () => {
           isOpen={showJobModal}
           onClose={() => setShowJobModal(false)}
           jobDetails={jobDetails}
+        />
+      )}
+      
+      {/* Add interview modal */}
+      {showInterviewModal && (
+        <InterviewModal
+          isOpen={showInterviewModal}
+          onClose={() => setShowInterviewModal(false)}
+          questions={interviewQuestions}
         />
       )}
     </>
