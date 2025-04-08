@@ -41,8 +41,8 @@ const FeatureTwo = () => {
               <p className="text-lg mt-40 lg-mt-20 mb-40 lg-mb-30">
                 Our cutting-edge engine works behind the scenes to automate candidate matching, skill development, and application tracking—so you can focus on success.
               </p>
-              <Link href="/about-us"
-                className="btn-nine tran3s d-flex align-items-center"
+              <Link href="/register"
+                className="btn-five rounded-pill tran3s d-inline-flex align-items-center px-4 py-2"
               >
                 <span className="fw-500 me-2">Discover How</span>
                 <i className="bi bi-arrow-right"></i>

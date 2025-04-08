@@ -58,7 +58,8 @@ async function getJob(id: string) {
 }
 
 export default async function JobDetailsV1Page({ params }: { params: { id: string } }) {
-  const job = await getJob(params.id);
+  const resolvedParams = await params;
+  const job = await getJob(resolvedParams.id);
 
   if (!job) {
     notFound();

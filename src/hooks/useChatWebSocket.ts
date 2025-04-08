@@ -4,7 +4,7 @@ interface WebSocketMessage {
   type: string;
   content?: any;
   agent?: string;
-  tool?: { name: string; arguments: any };
+  tool?: { name: string; arguments: any } | string;
   output?: any;
   text?: string; // For sending
 }
@@ -16,8 +16,10 @@ interface UseChatWebSocketOptions {
   onMessageStream: (delta: string) => void;
   onCompleteMessage: (fullMessage: string) => void;
   onError?: (event: Event) => void;
+  onToolCallOutput?: (toolName: string, output: any) => void;
   maxReconnectAttempts?: number;
   reconnectInterval?: number;
+  getAuthToken?: () => Promise<string | null>;
 }
 
 export const useChatWebSocket = ({
@@ -25,8 +27,10 @@ export const useChatWebSocket = ({
   onMessageStream,
   onCompleteMessage,
   onError,
+  onToolCallOutput,
   maxReconnectAttempts = 3,
   reconnectInterval = 2000,
+  getAuthToken = async () => null,
 }: UseChatWebSocketOptions) => {
   const [status, setStatus] = useState<ConnectionStatus>('closed');
   const ws = useRef<WebSocket | null>(null);
@@ -42,7 +46,7 @@ export const useChatWebSocket = ({
     }
   }, []);
 
-  const connect = useCallback(() => {
+  const connect = useCallback(async () => {
     // Clear any existing reconnect timeouts
     clearReconnectTimeout();
     
@@ -58,7 +62,19 @@ export const useChatWebSocket = ({
     setStatus('connecting');
     
     try {
-      ws.current = new WebSocket(url);
+      // Get the auth token before creating the WebSocket
+      const authToken = await getAuthToken();
+      console.log('Auth token available:', !!authToken);
+      
+      // Create WebSocket with authentication headers
+      let wsUrl = new URL(url);
+      
+      // If we have an auth token, add it as a query parameter
+      if (authToken) {
+        wsUrl.searchParams.append('token', authToken);
+      }
+      
+      ws.current = new WebSocket(wsUrl.toString());
 
       ws.current.onopen = () => {
         console.log('WebSocket connected!');
@@ -81,6 +97,13 @@ export const useChatWebSocket = ({
             case 'done':
               // Clear the current message after completion
               currentMessage.current = "";
+              break;
+            case 'tool_call_output':
+              // Handle tool call output message type
+              if (onToolCallOutput && data.tool && data.output) {
+                const toolName = typeof data.tool === 'string' ? data.tool : data.tool.name;
+                onToolCallOutput(toolName, data.output);
+              }
               break;
             // Skip other message types - they're not needed for basic chat functionality
             default:
@@ -127,7 +150,7 @@ export const useChatWebSocket = ({
       console.error('Error creating WebSocket:', error);
       setStatus('error');
     }
-  }, [url, onMessageStream, onCompleteMessage, onError, maxReconnectAttempts, reconnectInterval, clearReconnectTimeout]);
+  }, [url, onMessageStream, onCompleteMessage, onError, onToolCallOutput, maxReconnectAttempts, reconnectInterval, clearReconnectTimeout, getAuthToken]);
 
   const disconnect = useCallback(() => {
     // Mark as manual disconnect to prevent auto-reconnect

@@ -1,6 +1,8 @@
-import React from 'react';
-import { IJobType } from '@/types/job-data-type';
+'use client';
+
+import React, { useState } from 'react';
 import CompanyLogo from '@/app/components/common/CompanyLogo';
+import { useChat } from '@/context/ChatContext';
 
 interface Job {
   id: string;
@@ -24,6 +26,12 @@ interface Job {
 }
 
 const JobDetailsV1Area = ({job}: {job: Job}) => {
+  // Get the chat context
+  const { applyForJob } = useChat();
+
+  // Add loading state
+  const [isApplying, setIsApplying] = useState(false);
+
   // Safe parsing function with string cleanup
   const safeParseArray = (data: any): string[] => {
     if (Array.isArray(data)) return data;
@@ -159,8 +167,25 @@ const JobDetailsV1Area = ({job}: {job: Job}) => {
                 </ul>
               </div>
               {job.howToApply && (
-                <a href={`mailto:${job.email}`} className="btn-ten fw-500 text-white w-100 text-center tran3s mt-25">
-                  Apply Now
+                <a 
+                  href="#" 
+                  className={`apply-now-btn tran3s ${isApplying ? 'disabled' : ''}`}
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    if (isApplying) return;
+                    
+                    setIsApplying(true);
+                    try {
+                      await applyForJob(job);
+                    } catch (error) {
+                      console.error('Error applying for job:', error);
+                    } finally {
+                      // Reset after a short delay to allow visual feedback
+                      setTimeout(() => setIsApplying(false), 2000);
+                    }
+                  }}
+                >
+                  {isApplying ? 'Opening Chat...' : 'Apply Now'}
                 </a>
               )}
             </div>

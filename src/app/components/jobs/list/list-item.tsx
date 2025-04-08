@@ -57,8 +57,8 @@ const ListItem = ({ item, style_2, cls='' }: { item: Job; style_2?: boolean; cls
             </Link>
           </div>
         </div>
-        <div className="col-lg-2 col-md-4 col-sm-6">
-          <div className="btn-group d-flex align-items-center justify-content-md-end">
+        <div className="col-lg-1">
+          <div className="btn-group">
             {/* Bookmark button hidden for now
             <button
               onClick={() => handleAddWishlist(item)}

@@ -1,12 +1,22 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import RegisterForm from "../forms/register-form";
 import google from "@/assets/images/icon/google.png";
 import facebook from "@/assets/images/icon/facebook.png";
 
 const RegisterArea = () => {
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<"candidate" | "employer">("candidate");
+
+  useEffect(() => {
+    // Check if the tab query parameter is present
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'employer') {
+      setActiveTab("employer");
+    }
+  }, [searchParams]);
 
   const handleTabChange = (tabType: "candidate" | "employer") => {
     console.log("Switching to tab:", tabType);

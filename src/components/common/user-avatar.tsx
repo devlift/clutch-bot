@@ -84,10 +84,6 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ user, userName }) => {
               <i className="bi bi-credit-card"></i>
               <span>My Subscription</span>
             </Link>
-            <Link href="/accounts" className="menu-item">
-              <i className="bi bi-people"></i>
-              <span>Select Account</span>
-            </Link>
             <button onClick={handleSignOut} className="menu-item sign-out">
               <i className="bi bi-box-arrow-right"></i>
               <span>Sign Out</span>

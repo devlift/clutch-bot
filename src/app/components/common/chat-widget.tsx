@@ -3,11 +3,31 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import ChatWidgetQuickLinks from './chat-widget-quick-links';
 import { useChatWebSocket } from "@/hooks/useChatWebSocket";
+import ReactMarkdown from 'react-markdown';
+import { supabase } from "@/lib/supabase";
+import CreateJobModal from '../modals/create-job-modal';
 
 interface FileItem {
   name: string;
   type: string;
   size: string;
+}
+
+interface JobDetailsOutput {
+  title: string;
+  description: string;
+  wage: number;
+  wageType: string;
+  requirements: string[];
+  location: string;
+  jobType: string;
+  schedule: string;
+  benefits: string[];
+  responsibilities: string[];
+  howToApply: string[] | string;
+  advertiseUntil: string;
+  status: string;
+  tags: string[];
 }
 
 interface Message {
@@ -16,9 +36,25 @@ interface Message {
   sender: "user" | "bot";
   files?: FileItem[];
   isStreaming?: boolean;
+  toolOutput?: {
+    tool: string;
+    output: any;
+  };
 }
 
 const WEBSOCKET_URL = "wss://clutch.ngrok.app/chat";
+
+// Get auth token function
+const getSupabaseAuthToken = async (): Promise<string | null> => {
+  try {
+    const { data } = await supabase.auth.getSession();
+    // Return the access token if session exists
+    return data.session?.access_token || null;
+  } catch (error) {
+    console.error("Error retrieving auth token:", error);
+    return null;
+  }
+};
 
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,6 +82,10 @@ const ChatWidget = () => {
   const [showConnectionError, setShowConnectionError] = useState(false);
   const maxReconnectAttempts = 3;
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Add state for job details modal
+  const [showJobModal, setShowJobModal] = useState(false);
+  const [jobDetails, setJobDetails] = useState<JobDetailsOutput | null>(null);
 
   // --- WebSocket Integration --- 
   const handleMessageStream = useCallback((streamedMessage: string) => {
@@ -96,6 +136,42 @@ const ChatWidget = () => {
     }]);
   }, [maxReconnectAttempts]);
 
+  // Add new function to handle tool call outputs
+  const handleToolCallOutput = useCallback((toolName: string, output: any) => {
+    console.log(`Received tool output from ${toolName}:`, output);
+    
+    if (toolName === 'create_job_details') {
+      // Process the output - remove status and ensure wageType has proper case
+      const processedOutput = {
+        ...output,
+        // Use proper case for wageType (Salary or Hourly)
+        wageType: output.wageType 
+          ? (output.wageType.toLowerCase() === 'hourly' ? 'Hourly' : 'Salary') 
+          : 'Salary'
+      };
+      
+      // Delete status if it exists
+      if ('status' in processedOutput) {
+        delete processedOutput.status;
+      }
+      
+      // Store the job details with proper formatting
+      setJobDetails(processedOutput);
+      
+      // Add a message with the job details and a button
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        text: "I've created a draft job posting based on our conversation. Would you like to review and publish it?",
+        sender: "bot",
+        isStreaming: false,
+        toolOutput: {
+          tool: toolName,
+          output: processedOutput
+        }
+      }]);
+    }
+  }, []);
+
   const {
     connect,
     disconnect,
@@ -105,7 +181,9 @@ const ChatWidget = () => {
     url: WEBSOCKET_URL,
     onMessageStream: handleMessageStream,
     onCompleteMessage: () => {}, // Empty function as we're not using it
-    onError: handleWebSocketError
+    onError: handleWebSocketError,
+    getAuthToken: getSupabaseAuthToken,
+    onToolCallOutput: handleToolCallOutput // Add the new callback
   });
 
   // Implement connection with backoff
@@ -320,37 +398,125 @@ const ChatWidget = () => {
 
   // Check for URL parameters to automatically open the chat
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const openChat = params.get('openChat');
-      const welcomeType = params.get('welcome');
-      const message = params.get('message');
-      
-      if (openChat === 'true' && message) {
-        // Open the chat automatically
-        setIsOpen(true);
-        setReconnectAttempts(0);
-        setShowConnectionError(false);
-        attemptConnection();
-        
-        // Clear URL parameters without refreshing the page
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        // Add a small delay to ensure the connection is established
-        setTimeout(() => {
-          // Add bot welcome message based on the user type
-          setMessages([
-            { 
-              id: Date.now().toString() + "-welcome", 
-              text: decodeURIComponent(message), 
-              sender: "bot", 
-              isStreaming: false 
-            }
-          ]);
-        }, 500);
-      }
+    // Skip on server side
+    if (typeof window === 'undefined') return;
+    
+    const queryParams = new URLSearchParams(window.location.search);
+    if (queryParams.get('openChat') === 'true') {
+      // Reset connection state
+      setReconnectAttempts(0);
+      setShowConnectionError(false);
+      // Open chat and connect
+      setIsOpen(true);
+      attemptConnection();
     }
   }, [attemptConnection, setIsOpen, setReconnectAttempts, setShowConnectionError, setMessages]); // Include all dependencies
+
+  // Function to send a message to the server without displaying in UI
+  const sendSilentMessage = useCallback((message: string) => {
+    // Only send if connection is open
+    if (wsStatus === 'open') {
+      sendWebSocketMessage({ text: message });
+      return true;
+    }
+    return false;
+  }, [wsStatus, sendWebSocketMessage]);
+
+  // Add listener for custom events to open the chat widget and send silent messages
+  useEffect(() => {
+    // Handler for opening the chat widget
+    const handleOpenChatWidget = () => {
+      if (!isOpen) {
+        // Reset connection state
+        setReconnectAttempts(0);
+        setShowConnectionError(false);
+        // Open chat and connect
+        setIsOpen(true);
+        attemptConnection();
+      }
+
+      // Dispatch an event to confirm the widget is open
+      setTimeout(() => {
+        document.dispatchEvent(new CustomEvent('chatWidgetOpened'));
+      }, 100);
+    };
+
+    // Handler for sending silent messages
+    const handleSilentMessage = (event: CustomEvent<{message: string, messageId: string}>) => {
+      const { message, messageId } = event.detail;
+      
+      // If chat is closed, open it first
+      if (!isOpen) {
+        setIsOpen(true);
+        attemptConnection();
+      }
+      
+      // Function to send the message and report success
+      const trySendMessage = () => {
+        if (wsStatus === 'open') {
+          console.log('Sending silent message through WebSocket');
+          sendWebSocketMessage({ text: message });
+          // Report success
+          document.dispatchEvent(new CustomEvent('silentMessageSent', { 
+            detail: { messageId } 
+          }));
+          return true;
+        }
+        return false;
+      };
+      
+      // Initial attempt after a delay to ensure connection is ready
+      setTimeout(() => {
+        // If already connected, send immediately
+        if (trySendMessage()) return;
+        
+        // Otherwise set up retries
+        let attempts = 0;
+        const maxAttempts = 20; // 10 seconds max
+        
+        const interval = setInterval(() => {
+          attempts++;
+          
+          // Update connection status in console
+          console.log(`Connection status: ${wsStatus}, attempt ${attempts}/${maxAttempts}`);
+          
+          // Try to send message
+          if (trySendMessage()) {
+            clearInterval(interval);
+          } 
+          // Stop trying after max attempts
+          else if (attempts >= maxAttempts) {
+            document.dispatchEvent(new CustomEvent('silentMessageFailed', { 
+              detail: { 
+                messageId,
+                error: 'Connection not established after maximum attempts' 
+              } 
+            }));
+            clearInterval(interval);
+          }
+        }, 500);
+      }, 1000);
+    };
+
+    // Add event listeners
+    window.addEventListener('openChatWidget', handleOpenChatWidget);
+    window.addEventListener('sendSilentChatMessage', handleSilentMessage as EventListener);
+
+    // Remove event listeners on cleanup
+    return () => {
+      window.removeEventListener('openChatWidget', handleOpenChatWidget);
+      window.removeEventListener('sendSilentChatMessage', handleSilentMessage as EventListener);
+    };
+  }, [isOpen, attemptConnection, wsStatus, sendWebSocketMessage]);
+
+  // Add function to handle opening the job modal
+  const handleOpenJobModal = () => {
+    if (jobDetails) {
+      setShowJobModal(true);
+    } else {
+      console.error("No job details available");
+    }
+  };
 
   return (
     <>
@@ -402,7 +568,23 @@ const ChatWidget = () => {
             {messages.map((message) => (
               <div key={message.id} className={`message ${message.sender}`}>
                 <div className="message-content">
-                  <p>{message.text}</p>
+                  {message.sender === 'bot' ? (
+                    <>
+                      <ReactMarkdown>{typeof message.text === 'string' ? message.text : ''}</ReactMarkdown>
+                      {message.toolOutput?.tool === 'create_job_details' && (
+                        <div className="mt-3">
+                          <button 
+                            className="btn theme-btn btn-sm"
+                            onClick={handleOpenJobModal}
+                          >
+                            Create Posting
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <p>{typeof message.text === 'string' ? message.text : ''}</p>
+                  )}
                   {message.files && message.files.length > 0 && (
                     <div className="file-attachments">
                       {message.files.map((file, fileIndex) => (
@@ -513,6 +695,15 @@ const ChatWidget = () => {
             </div>
           )}
         </>
+      )}
+      
+      {/* Add job details modal */}
+      {showJobModal && jobDetails && (
+        <CreateJobModal 
+          isOpen={showJobModal}
+          onClose={() => setShowJobModal(false)}
+          jobDetails={jobDetails}
+        />
       )}
     </>
   );

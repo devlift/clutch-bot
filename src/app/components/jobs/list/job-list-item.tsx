@@ -47,8 +47,8 @@ const JobListItem = ({ job }: { job: Job }) => {
             </Link>
           </div>
         </div>
-        <div className="col-lg-2 col-md-4 col-sm-6">
-          <div className="btn-group d-flex align-items-center justify-content-md-end">
+        <div className="col-lg-1">
+          <div className="btn-group">
             <Link href={`/jobs/${id}`} className="apply-btn text-center tran3s">
               DETAILS
             </Link>

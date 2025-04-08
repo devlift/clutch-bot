@@ -100,4 +100,12 @@
     margin-top: 8px;
     margin-left: 36px; // Align with text
   }
+}
+
+// Add custom styles for the Post a job button
+a[href="/register"].btn-five,
+a[href="/register?tab=employer"].btn-five,
+a[href^="/register"].btn-five,
+.btn-four {
+  color: white !important;
 } 
