@@ -2,6 +2,15 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 
+// Add TypeScript declarations for Web Speech API
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+    webkitAudioContext: typeof AudioContext;
+  }
+}
+
 interface InterviewModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -15,11 +24,20 @@ const InterviewModal: React.FC<InterviewModalProps> = ({ isOpen, onClose, questi
   const [isListening, setIsListening] = useState(false);
   const [isAiSpeaking, setIsAiSpeaking] = useState(false);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  const [recognition, setRecognition] = useState<any>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [currentUtterance, setCurrentUtterance] = useState<string[]>([]);
+  const [audioBuffer, setAudioBuffer] = useState<string[]>([]);
+  const [isProcessingAudio, setIsProcessingAudio] = useState(false);
+  const [recognitionActive, setRecognitionActive] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+  const audioAccumulatorRef = useRef<string[]>([]);
+  const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Initialize webcam when modal opens
   useEffect(() => {
@@ -72,6 +90,277 @@ const InterviewModal: React.FC<InterviewModalProps> = ({ isOpen, onClose, questi
     }
   };
   
+  // Replace the MediaRecorder useEffect with Web Speech API recognition
+  useEffect(() => {
+    if (voiceStatus !== 'connected' || !streamRef.current) return;
+    
+    console.log('Setting up Web Speech API for client-side transcription');
+    
+    try {
+      // Check if SpeechRecognition is available
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        throw new Error('Speech recognition not supported in this browser');
+      }
+      
+      // Create speech recognition instance
+      const recognitionInstance = new SpeechRecognition();
+      recognitionInstance.continuous = true;
+      recognitionInstance.interimResults = true;
+      recognitionInstance.lang = 'en-US';
+      
+      // Handle speech recognition results - using proper Twilio format
+      recognitionInstance.onresult = (event: any) => {
+        const transcript = event.results[event.results.length - 1][0].transcript;
+        const isFinal = event.results[event.results.length - 1].isFinal;
+        
+        // Log interim results for debugging
+        console.log(`Speech recognized: "${transcript}" (final: ${isFinal})`);
+        
+        // Only send final results to the server
+        if (isFinal && wsRef.current?.readyState === WebSocket.OPEN && sessionId) {
+          console.log('Sending final transcription to server in Twilio format');
+          wsRef.current.send(JSON.stringify({
+            type: 'prompt',
+            voicePrompt: transcript,  // Must use voicePrompt, not text (Twilio format)
+            last: true,               // Must use last, not final (Twilio format)
+            sessionId: sessionId
+          }));
+        }
+      };
+      
+      // Handle errors
+      recognitionInstance.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        if (event.error === 'no-speech') {
+          console.log('No speech detected, continuing...');
+        } else if (event.error === 'aborted') {
+          console.log('Speech recognition aborted');
+        } else {
+          setVoiceStatus('error');
+        }
+      };
+      
+      // Handle recognition end
+      recognitionInstance.onend = () => {
+        console.log('Speech recognition session ended');
+        setRecognitionActive(false);
+        
+        // Restart if we're still in listening mode
+        if (isListening && !isAiSpeaking) {
+          try {
+            console.log('Restarting speech recognition after session ended');
+            recognitionInstance.start();
+            setRecognitionActive(true);
+          } catch (err) {
+            console.error('Error restarting recognition after end:', err);
+          }
+        }
+      };
+      
+      // Store the recognition instance
+      setRecognition(recognitionInstance);
+      
+      // Clean up function
+      return () => {
+        try {
+          recognitionInstance.stop();
+          setRecognitionActive(false);
+          console.log('Speech recognition cleaned up');
+        } catch (err) {
+          // Ignore errors when stopping recognition that hasn't started
+        }
+      };
+    } catch (error) {
+      console.error('Error setting up speech recognition:', error);
+    }
+  }, [voiceStatus, sessionId]);
+
+  // Add useEffect to handle listening state changes
+  useEffect(() => {
+    if (!recognition) return;
+    
+    console.log(`Listening state changed - isListening: ${isListening}, isAiSpeaking: ${isAiSpeaking}, recognitionActive: ${recognitionActive}`);
+    
+    if (isListening && voiceStatus === 'connected' && !isAiSpeaking) {
+      if (!recognitionActive) {
+        try {
+          recognition.start();
+          setRecognitionActive(true);
+          console.log('Speech recognition started');
+        } catch (err) {
+          console.error('Error starting speech recognition:', err);
+          setRecognitionActive(false);
+        }
+      }
+    } else if (recognitionActive) {
+      try {
+        recognition.stop();
+        setRecognitionActive(false);
+        console.log('Speech recognition stopped');
+      } catch (err) {
+        // Ignore errors when stopping recognition that hasn't started
+      }
+    }
+  }, [isListening, voiceStatus, recognition, isAiSpeaking, recognitionActive]);
+
+  // Handle audio accumulation
+  const handleAudioMessage = (payload: string) => {
+    try {
+      // Add to audio accumulator
+      audioAccumulatorRef.current.push(payload);
+      console.log(`Added audio to accumulator, size: ${audioAccumulatorRef.current.length}`);
+      
+      // Clear any existing processing timeout
+      if (processingTimeoutRef.current) {
+        clearTimeout(processingTimeoutRef.current);
+      }
+      
+      // Set a new timeout to process audio after a short delay
+      // This allows us to collect multiple chunks before processing
+      processingTimeoutRef.current = setTimeout(() => {
+        if (audioAccumulatorRef.current.length > 0) {
+          // Combine all accumulated audio data
+          const combinedAudio = audioAccumulatorRef.current;
+          console.log(`Processing ${combinedAudio.length} audio chunks`);
+          
+          // Clear the accumulator
+          audioAccumulatorRef.current = [];
+          
+          // Play directly from the accumulated audio
+          playAudioFromChunks(combinedAudio);
+        }
+      }, 300); // 300ms delay to collect chunks
+    } catch (error) {
+      console.error('Error handling audio message:', error);
+    }
+  };
+
+  // Direct audio playback from chunks
+  const playAudioFromChunks = (chunks: string[]) => {
+    if (chunks.length === 0) return;
+    
+    console.log(`Attempting to play ${chunks.length} audio chunks`);
+    setIsProcessingAudio(true);
+    setIsAiSpeaking(true);
+    setIsListening(false);
+    
+    // Play first chunk to test
+    let currentIndex = 0;
+    
+    // Create a new audio element
+    const playNextChunk = () => {
+      if (currentIndex >= chunks.length) {
+        console.log('Finished playing all chunks');
+        setIsProcessingAudio(false);
+        setIsAiSpeaking(false);
+        setTimeout(() => setIsListening(true), 300);
+        return;
+      }
+      
+      const chunk = chunks[currentIndex];
+      console.log(`Playing chunk ${currentIndex + 1}/${chunks.length}`);
+      
+      try {
+        // Create and play audio
+        const audio = new Audio(`data:audio/mp3;base64,${chunk}`);
+        currentAudioRef.current = audio;
+        
+        // Event handlers
+        audio.onloadeddata = () => console.log(`Chunk ${currentIndex + 1} loaded`);
+        audio.onplay = () => console.log(`Chunk ${currentIndex + 1} playing`);
+        audio.onended = () => {
+          console.log(`Chunk ${currentIndex + 1} ended`);
+          currentIndex++;
+          playNextChunk();
+        };
+        audio.onerror = (e) => {
+          console.error(`Error playing chunk ${currentIndex + 1}:`, e);
+          // Try playing MP3 directly with a simpler approach
+          trySimplePlayback(chunk, currentIndex, () => {
+            currentIndex++;
+            playNextChunk();
+          });
+        };
+        
+        // Force autoplay
+        audio.autoplay = true;
+        
+        // Start playback with a timeout fallback
+        const playPromise = audio.play();
+        
+        if (playPromise) {
+          playPromise.catch(err => {
+            console.error(`Play error on chunk ${currentIndex + 1}:`, err);
+            // Try alternative playback
+            trySimplePlayback(chunk, currentIndex, () => {
+              currentIndex++;
+              playNextChunk();
+            });
+          });
+        }
+        
+        // Safety timeout
+        setTimeout(() => {
+          if (currentAudioRef.current === audio) {
+            console.log(`Safety timeout on chunk ${currentIndex + 1}`);
+            currentIndex++;
+            playNextChunk();
+          }
+        }, 5000);
+      } catch (err) {
+        console.error(`Error initializing chunk ${currentIndex + 1}:`, err);
+        currentIndex++;
+        playNextChunk();
+      }
+    };
+    
+    // Start playing
+    playNextChunk();
+  };
+  
+  // Simple fallback playback method
+  const trySimplePlayback = (chunk: string, index: number, onComplete: () => void) => {
+    console.log(`Trying simple playback for chunk ${index + 1}`);
+    
+    try {
+      // Create element directly in the DOM
+      const audioEl = document.createElement('audio');
+      audioEl.src = `data:audio/mp3;base64,${chunk}`;
+      audioEl.style.display = 'none';
+      document.body.appendChild(audioEl);
+      
+      audioEl.onended = () => {
+        document.body.removeChild(audioEl);
+        onComplete();
+      };
+      
+      audioEl.onerror = () => {
+        document.body.removeChild(audioEl);
+        console.error(`Simple playback failed for chunk ${index + 1}`);
+        onComplete();
+      };
+      
+      // Force play
+      audioEl.play().catch(() => {
+        document.body.removeChild(audioEl);
+        console.error(`Simple play() failed for chunk ${index + 1}`);
+        onComplete();
+      });
+      
+      // Safety timeout
+      setTimeout(() => {
+        if (document.body.contains(audioEl)) {
+          document.body.removeChild(audioEl);
+          onComplete();
+        }
+      }, 5000);
+    } catch (err) {
+      console.error(`Simple playback error for chunk ${index + 1}:`, err);
+      onComplete();
+    }
+  };
+
   const startInterview = async () => {
     try {
       setVoiceStatus('connecting');
@@ -94,11 +383,10 @@ const InterviewModal: React.FC<InterviewModalProps> = ({ isOpen, onClose, questi
       const data = await response.json();
       console.log('Voice session initialized:', data);
       
-      // Initialize audio context for streaming
-      const audioContext = new AudioContext();
-      audioContextRef.current = audioContext;
+      // Store session ID for use in messages
+      setSessionId(data.session_id);
       
-      // Create audio element for playback (using useState instead of useRef)
+      // Create audio element for playback
       const newAudioElement = new Audio();
       newAudioElement.autoplay = true;
       setAudioElement(newAudioElement);
@@ -115,6 +403,13 @@ const InterviewModal: React.FC<InterviewModalProps> = ({ isOpen, onClose, questi
       socket.onopen = () => {
         console.log('WebSocket connection established');
         setVoiceStatus('connected');
+        
+        // Send setup message in Twilio format
+        socket.send(JSON.stringify({
+          type: 'setup',
+          sessionId: data.session_id
+        }));
+        
         setIsAiSpeaking(true); // AI will speak first
       };
       
@@ -125,42 +420,22 @@ const InterviewModal: React.FC<InterviewModalProps> = ({ isOpen, onClose, questi
           console.log(`Message type: ${message.type}`);
           
           if (message.type === 'text') {
-            // Handle text message from the AI
-            const content = message.token || message.content || '';
-            const isFinal = message.last || message.final || false;
+            // Handle text message from the AI (Twilio format uses "token" not "content")
+            const content = message.token || '';
+            const isFinal = message.last || false; // Twilio uses "last" not "final"
             
-            console.log(`Received text: "${content.substring(0, 50)}${content.length > 50 ? '...' : ''}", final: ${isFinal}`);
+            console.log(`Received text: "${content.substring(0, 50)}${content.length > 50 ? '...' : ''}", last: ${isFinal}`);
+            
+            // Accumulate text
+            setCurrentUtterance(prev => [...prev, content]);
             
             if (content && content.trim()) {
-              // If we receive content, AI is speaking
-              setIsAiSpeaking(true);
-              setIsListening(false);
-              
-              // Create a speech utterance for the text if browser supports it
-              if ('speechSynthesis' in window && audioElement) {
-                console.log('Using browser speech synthesis for playback');
-                const utterance = new SpeechSynthesisUtterance(content);
-                
-                // Add event handlers for speech synthesis events
-                utterance.onstart = () => console.log('Speech synthesis started');
-                utterance.onend = () => {
-                  console.log('Speech synthesis ended');
-                  if (isFinal) {
-                    setIsAiSpeaking(false);
-                    setIsListening(true);
-                  }
-                };
-                utterance.onerror = (err) => console.error('Speech synthesis error:', err);
-                
-                speechSynthesis.speak(utterance);
-              } else {
-                console.warn('Speech synthesis not available in this browser');
-              }
+              // Wait for audio to play
+              console.log('Received text content, waiting for audio playback');
             }
             
-            if (isFinal) {
-              // When AI is done speaking, switch to listening mode
-              // Add a slight delay to ensure any audio playback is complete
+            // If final message and no audio is being processed
+            if (isFinal && audioAccumulatorRef.current.length === 0 && !isProcessingAudio && audioBuffer.length === 0) {
               setTimeout(() => {
                 setIsAiSpeaking(false);
                 setIsListening(true);
@@ -174,48 +449,19 @@ const InterviewModal: React.FC<InterviewModalProps> = ({ isOpen, onClose, questi
           } else if (message.type === 'speaking_ended') {
             // Server indicates AI is done speaking, now listen to user
             console.log('Server indicated AI is done speaking');
-            setIsAiSpeaking(false);
-            setIsListening(true);
+            if (audioAccumulatorRef.current.length === 0 && !isProcessingAudio && audioBuffer.length === 0) {
+              setIsAiSpeaking(false);
+              setIsListening(true);
+            }
           } else if (message.type === 'audio') {
-            // Handle audio data if the server sends it
-            console.log('Received audio data from server');
+            // Handle audio data from ElevenLabs (MP3 format)
+            console.log('Received audio data from server (ElevenLabs MP3)');
             
             if (message.payload) {
-              console.log(`Audio payload received, size: ${message.payload.length}, sample rate: ${message.sampleRate || 'unknown'}`);
+              console.log(`Received audio data, length: ${message.payload.length}`);
               
-              if (audioElement) {
-                console.log('Setting audio element source and playing');
-                
-                // Get the correct audio format from the message or default to mp3
-                const format = message.format || 'mp3';
-                
-                // Create audio source from base64 with the correct MIME type
-                const audioSrc = `data:audio/${format};base64,${message.payload}`;
-                audioElement.src = audioSrc;
-                
-                // Add event listeners to monitor audio playback
-                audioElement.onloadeddata = () => console.log('Audio data loaded');
-                audioElement.onplay = () => console.log('Audio playback started');
-                audioElement.onended = () => console.log('Audio playback ended');
-                audioElement.onerror = (e) => console.error('Audio playback error:', e);
-                
-                audioElement.play().then(() => {
-                  console.log('Audio playback initiated successfully');
-                }).catch(err => {
-                  console.error('Error playing audio:', err);
-                  
-                  // Try an alternative approach if the first fails
-                  console.log('Trying alternative audio playback method');
-                  const tmpAudio = new Audio(audioSrc);
-                  tmpAudio.onloadeddata = () => console.log('Temp audio loaded');
-                  tmpAudio.onplay = () => console.log('Temp audio playing');
-                  tmpAudio.onended = () => console.log('Temp audio ended');
-                  tmpAudio.onerror = (e) => console.error('Temp audio error:', e);
-                  tmpAudio.play().catch(e => console.error('Temp audio playback failed:', e));
-                });
-              } else {
-                console.error('Audio element not available for playback');
-              }
+              // Process the audio with our accumulator
+              handleAudioMessage(message.payload);
             } else {
               console.warn('Audio message received but no payload found');
             }
@@ -245,206 +491,19 @@ const InterviewModal: React.FC<InterviewModalProps> = ({ isOpen, onClose, questi
       // Save the socket reference
       wsRef.current = socket;
       
-      // Create a simplified audio-only stream for the MediaRecorder
-      try {
-        // Function to check for supported MIME types
-        const getSupportedMimeType = () => {
-          // List of MIME types to try, in order of preference
-          const mimeTypes = [
-            'audio/webm;codecs=opus',
-            'audio/webm',
-            'audio/mp4',
-            'audio/ogg;codecs=opus',
-            'audio/ogg'
-          ];
-          
-          for (const type of mimeTypes) {
-            if (MediaRecorder.isTypeSupported(type)) {
-              console.log(`Using supported MIME type: ${type}`);
-              return type;
-            }
-          }
-          
-          // If none are supported, return empty string
-          console.warn('No supported MIME types found for MediaRecorder');
-          return '';
-        };
-
-        // Get supported MIME type
-        const mimeType = getSupportedMimeType();
-        
-        // Instead of using the camera stream directly, create a dedicated audio stream
-        // This can help avoid issues with complex video+audio streams
-        if (streamRef.current) {
-          const audioContext = new AudioContext();
-          const source = audioContext.createMediaStreamSource(streamRef.current);
-          const destination = audioContext.createMediaStreamDestination();
-          source.connect(destination);
-          
-          // Use only the audio portion for recording
-          const audioOnlyStream = destination.stream;
-          
-          // Create MediaRecorder with proper config
-          const mediaRecorderOptions: MediaRecorderOptions = {
-            audioBitsPerSecond: 16000  // Use a lower bitrate for better compatibility
-          };
-          
-          // Only add mimeType if it's supported
-          if (mimeType) {
-            mediaRecorderOptions.mimeType = mimeType;
-          }
-          
-          // Delay MediaRecorder creation to ensure stream is fully initialized
-          setTimeout(() => {
-            try {
-              console.log('Creating MediaRecorder with options:', mediaRecorderOptions);
-              
-              // Create MediaRecorder with fallback to default options if needed
-              const mediaRecorder = new MediaRecorder(audioOnlyStream, mediaRecorderOptions);
-              
-              // Add event handlers before starting
-              mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) {
-                  console.log(`Audio data available, size: ${event.data.size} bytes`);
-                  // Always send audio data when available, regardless of isListening state
-                  const reader = new FileReader();
-                  reader.onloadend = () => {
-                    const base64data = reader.result?.toString().split(',')[1];
-                    if (base64data) {
-                      // Process the data to ensure it's a valid length for 16-bit PCM
-                      // Create a Uint8Array from the base64 data to check and adjust the buffer size
-                      const rawData = atob(base64data);
-                      let dataLength = rawData.length;
-                      
-                      // Make sure the buffer length is even (required for 16-bit PCM)
-                      // If it's odd, we'll clip the last byte
-                      let processedData = base64data;
-                      if (dataLength % 2 !== 0) {
-                        console.log(`Adjusting buffer size from ${dataLength} to ${dataLength - 1} bytes to ensure it's even`);
-                        // Create a new buffer that's one byte shorter
-                        const newBuffer = new Uint8Array(dataLength - 1);
-                        for (let i = 0; i < dataLength - 1; i++) {
-                          newBuffer[i] = rawData.charCodeAt(i);
-                        }
-                        // Convert back to base64
-                        processedData = btoa(String.fromCharCode.apply(null, [...newBuffer]));
-                      }
-                      
-                      // Send audio in the format expected by the server
-                      const message = {
-                        type: 'prompt',  // Use the correct message type according to API docs
-                        audio: processedData,
-                        sampleRate: 16000, // Specify the sample rate
-                        final: false     // Only the last chunk should be final
-                      };
-                      console.log(`Sending audio message, type: ${message.type}, size: ${processedData.length}`);
-                      socket.send(JSON.stringify(message));
-                      console.log('Audio data sent, size:', processedData.length);
-                    } else {
-                      console.error('Failed to convert audio to base64');
-                    }
-                  };
-                  reader.onerror = (err) => {
-                    console.error('Error reading audio data:', err);
-                  };
-                  reader.readAsDataURL(event.data);
-                } else {
-                  if (event.data.size === 0) {
-                    console.warn('Audio data available but size is 0, not sending');
-                  }
-                  if (socket.readyState !== WebSocket.OPEN) {
-                    console.warn(`WebSocket not open (state: ${socket.readyState}), cannot send audio`);
-                  }
-                }
-              };
-              
-              // Handle errors in the MediaRecorder
-              mediaRecorder.onerror = (error) => {
-                console.error('MediaRecorder error:', error);
-              };
-              
-              // Only try to start after handlers are set up
-              console.log('Starting MediaRecorder...');
-              mediaRecorder.start(100); // Send data every 100ms
-              console.log('MediaRecorder started successfully');
-
-              // Send a message to the server indicating we're using audio mode
-              if (socket.readyState === WebSocket.OPEN) {
-                socket.send(JSON.stringify({
-                  type: 'setup',
-                  useAudio: true,
-                  sampleRate: 16000
-                }));
-              }
-              
-              // Ensure we stop recording when the connection closes
-              socket.addEventListener('close', () => {
-                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                  try {
-                    mediaRecorder.stop();
-                  } catch (err) {
-                    console.error('Error stopping MediaRecorder:', err);
-                  }
-                }
-              });
-            } catch (error) {
-              console.error('Error creating MediaRecorder:', error);
-              
-              // Fallback to text input
-              console.log('Using text-only interview mode...');
-              
-              // Send a message to the server indicating we'll use text instead
-              if (socket.readyState === WebSocket.OPEN) {
-                socket.send(JSON.stringify({
-                  type: 'text_mode',
-                  message: 'Client unable to stream audio, using text mode'
-                }));
-              }
-            }
-          }, 1000); // Delay MediaRecorder creation by 1 second
-          
-          // Keep connection alive with ping messages regardless of recording status
-          const pingInterval = setInterval(() => {
-            if (socket.readyState === WebSocket.OPEN) {
-              socket.send(JSON.stringify({ type: 'ping' }));
-            } else {
-              clearInterval(pingInterval);
-            }
-          }, 30000); // Send ping every 30 seconds
-          
-          // Clean up interval when socket closes
-          socket.addEventListener('close', () => {
-            clearInterval(pingInterval);
-          });
-        }
-      } catch (error) {
-        console.error('Error setting up audio processing:', error);
-        
-        // Even if audio processing fails, we still want to continue with the WebSocket connection
-        console.log('Continuing with interview without audio recording...');
-        
-        // Send a message to the server indicating we'll use text
-        if (socket && socket.readyState === WebSocket.OPEN) {
-          socket.send(JSON.stringify({
-            type: 'text_mode',
-            message: 'Client unable to setup audio processing, using text mode'
-          }));
-        }
-        
-        // Keep the WebSocket connection alive with ping messages
-        const pingInterval = setInterval(() => {
-          if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({ type: 'ping' }));
-          } else {
-            clearInterval(pingInterval);
-          }
-        }, 30000);
-        
-        // Clean up interval when socket closes
-        socket.addEventListener('close', () => {
+      // Setup ping interval
+      const pingInterval = setInterval(() => {
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({ type: 'ping' }));
+        } else {
           clearInterval(pingInterval);
-        });
-      }
+        }
+      }, 30000); // Send ping every 30 seconds
+      
+      // Clean up interval when socket closes
+      socket.addEventListener('close', () => {
+        clearInterval(pingInterval);
+      });
       
     } catch (error) {
       console.error('Error starting interview:', error);
@@ -453,6 +512,41 @@ const InterviewModal: React.FC<InterviewModalProps> = ({ isOpen, onClose, questi
   };
   
   const closeVoiceConnection = () => {
+    // Clear any pending audio processing
+    if (processingTimeoutRef.current) {
+      clearTimeout(processingTimeoutRef.current);
+      processingTimeoutRef.current = null;
+    }
+    
+    // Clear audio accumulator
+    audioAccumulatorRef.current = [];
+    
+    // Stop current audio playback
+    if (currentAudioRef.current) {
+      try {
+        currentAudioRef.current.pause();
+        currentAudioRef.current.src = ''; // Clear src to release resources
+      } catch (err) {
+        console.error('Error stopping audio playback:', err);
+      }
+      currentAudioRef.current = null;
+    }
+    
+    // Clear audio buffer
+    setAudioBuffer([]);
+    setIsProcessingAudio(false);
+    setCurrentUtterance([]);
+    
+    // Clean up speech recognition if active
+    if (recognition) {
+      try {
+        recognition.stop();
+        setRecognitionActive(false);
+      } catch (err) {
+        // Ignore errors
+      }
+    }
+    
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.close();
       wsRef.current = null;
@@ -468,6 +562,7 @@ const InterviewModal: React.FC<InterviewModalProps> = ({ isOpen, onClose, questi
     setVoiceStatus('idle');
     setIsListening(false);
     setIsAiSpeaking(false);
+    setSessionId(null);
   };
   
   if (!isOpen) return null;
