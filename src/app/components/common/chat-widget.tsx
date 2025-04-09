@@ -65,6 +65,7 @@ const ChatWidget = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<FileItem[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   const quickLinks = [
     "Career advice", 
@@ -283,7 +284,7 @@ const ChatWidget = () => {
     setIsFullScreen(!isFullScreen);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(e.target.value);
   };
 
@@ -347,8 +348,9 @@ const ChatWidget = () => {
     sendUserMessage(inputValue);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
       sendMessage();
     }
   };
@@ -642,6 +644,21 @@ const ChatWidget = () => {
     setShowInterviewModal(true);
   };
 
+  // Handle text area auto-resize
+  useEffect(() => {
+    const adjustTextareaHeight = () => {
+      const textarea = textareaRef.current;
+      if (textarea) {
+        // Reset height to auto to get the correct scrollHeight
+        textarea.style.height = 'auto';
+        // Set the height to match the content
+        textarea.style.height = `${textarea.scrollHeight}px`;
+      }
+    };
+    
+    adjustTextareaHeight();
+  }, [inputValue]);
+
   return (
     <>
       {isOpen ? (
@@ -780,14 +797,16 @@ const ChatWidget = () => {
           )}
           
           <div className="chat-input">
-            <input
-              type="text"
-              placeholder="Type a message..."
+            <textarea
+              ref={textareaRef}
               value={inputValue}
               onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
-              disabled={wsStatus !== 'open' || showConnectionError} 
-            />
+              onKeyDown={handleKeyPress}
+              placeholder="Type a message..."
+              disabled={wsStatus !== 'open' || showConnectionError}
+              rows={1}
+              wrap="soft"
+            ></textarea>
             <div className="input-actions">
               <button 
                 className="attach-btn" 

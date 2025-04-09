@@ -30,6 +30,7 @@ const InterviewModal: React.FC<InterviewModalProps> = ({ isOpen, onClose, questi
   const [audioBuffer, setAudioBuffer] = useState<string[]>([]);
   const [isProcessingAudio, setIsProcessingAudio] = useState(false);
   const [recognitionActive, setRecognitionActive] = useState(false);
+  const [typedResponse, setTypedResponse] = useState('');
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -38,6 +39,7 @@ const InterviewModal: React.FC<InterviewModalProps> = ({ isOpen, onClose, questi
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const audioAccumulatorRef = useRef<string[]>([]);
   const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   
   // Initialize webcam when modal opens
   useEffect(() => {
@@ -565,6 +567,52 @@ const InterviewModal: React.FC<InterviewModalProps> = ({ isOpen, onClose, questi
     setSessionId(null);
   };
   
+  // Handle text area auto-resize
+  useEffect(() => {
+    const adjustTextareaHeight = () => {
+      const textarea = textareaRef.current;
+      if (textarea) {
+        // Reset height to auto to get the correct scrollHeight
+        textarea.style.height = 'auto';
+        // Set the height to match the content (plus a small buffer)
+        textarea.style.height = `${textarea.scrollHeight}px`;
+      }
+    };
+    
+    adjustTextareaHeight();
+  }, [typedResponse]);
+
+  // Handle text input change
+  const handleTextInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTypedResponse(e.target.value);
+  };
+  
+  // Send typed response
+  const sendTypedResponse = () => {
+    if (!typedResponse.trim() || !wsRef.current?.readyState || !sessionId) return;
+    
+    // Disable listening while sending typed response
+    setIsListening(false);
+    
+    console.log('Sending typed response:', typedResponse);
+    wsRef.current.send(JSON.stringify({
+      type: 'prompt',
+      voicePrompt: typedResponse.trim(),
+      last: true,
+      sessionId: sessionId
+    }));
+    
+    // Clear input after sending
+    setTypedResponse('');
+    
+    // Re-enable listening after sending
+    setTimeout(() => {
+      if (!isAiSpeaking) {
+        setIsListening(true);
+      }
+    }, 300);
+  };
+  
   if (!isOpen) return null;
   
   return (
@@ -688,6 +736,40 @@ const InterviewModal: React.FC<InterviewModalProps> = ({ isOpen, onClose, questi
                 </div>
               </div>
             </div>
+            
+            {voiceStatus === 'connected' && (
+              <div className="text-input-container mt-3">
+                <div className="card">
+                  <div className="card-body p-3">
+                    <div className="d-flex gap-2">
+                      <textarea
+                        ref={textareaRef}
+                        className="form-control auto-expand"
+                        rows={1}
+                        placeholder="Type your response here..."
+                        value={typedResponse}
+                        onChange={handleTextInputChange}
+                        disabled={isAiSpeaking}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendTypedResponse();
+                          }
+                        }}
+                        wrap="soft"
+                      />
+                      <button
+                        className="btn theme-btn"
+                        onClick={sendTypedResponse}
+                        disabled={isAiSpeaking || !typedResponse.trim()}
+                      >
+                        <i className="bi bi-send"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
         
@@ -787,6 +869,22 @@ const InterviewModal: React.FC<InterviewModalProps> = ({ isOpen, onClose, questi
             transform: scale(0.95);
             box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
           }
+        }
+        
+        .auto-expand {
+          min-height: 38px;
+          max-height: 150px;
+          resize: none;
+          overflow-y: hidden;
+          transition: height 0.1s ease-in-out;
+          white-space: normal;
+          overflow-wrap: break-word;
+          word-wrap: break-word;
+          width: 100%;
+        }
+        
+        .text-input-container {
+          margin-bottom: 10px;
         }
       `}</style>
     </div>
